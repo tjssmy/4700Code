@@ -2,7 +2,6 @@ clearvars
 close all
 % set(0,'DefaultFigureWindowStyle','docked')
 global C
-
 C.q_0 = 1.60217653e-19;             % electron charge
 C.hb = 1.054571596e-34;             % Dirac constant
 C.h = C.hb*2*pi;                    % Planck constant

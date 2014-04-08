@@ -1,4 +1,5 @@
 function [ Curr ] = GetCurrents(ncircs,MaxRad,nx,ny,Acond,Bcond,plot)
+global im fig fc map
 
 pcircs = rand(ncircs,2);
 pcircs(:,1) = pcircs(:,1)*nx;
@@ -29,7 +30,7 @@ for i = 1:nx
     for j = 1:ny
         n = j + (i-1)*ny;
         
-        if i == 1 
+        if i == 1
             G(n,:) = 0;
             G(n,n) = 1;
             B(n) = 1;
@@ -54,16 +55,16 @@ for i = 1:nx
             nxm = j + (i-2)*ny;
             nxp = j + (i)*ny;
             nym = j-1 + (i-1)*ny;
-                        
+            
             rxm = (cMap(i,j) + cMap(i-1,j))/2.0;
             rxp = (cMap(i,j) + cMap(i+1,j))/2.0;
             rym = (cMap(i,j) + cMap(i,j-1))/2.0;
-                        
+            
             G(n,n) = -(rxm+rxp+rym);
             G(n,nxm) = rxm;
             G(n,nxp) = rxp;
             G(n,nym) = rym;
-                        
+            
         else
             nxm = j + (i-2)*ny;
             nxp = j + (i)*ny;
@@ -104,14 +105,14 @@ for i = 1:nx
             Ex(i,j) = (Vmap(i+1,j) - Vmap(i,j));
         elseif i == nx
             Ex(i,j) = (Vmap(i,j) - Vmap(i-1,j));
-        else 
+        else
             Ex(i,j) = (Vmap(i+1,j) - Vmap(i-1,j))*0.5;
         end
         if j == 1
             Ey(i,j) = (Vmap(i,j+1) - Vmap(i,j));
         elseif j == ny
             Ey(i,j) = (Vmap(i,j) - Vmap(i,j-1));
-        else 
+        else
             Ey(i,j) = (Vmap(i,j+1) - Vmap(i,j-1))*0.5;
         end
     end
@@ -124,12 +125,25 @@ eFlowx = cMap.*Ex;
 eFlowy = cMap.*Ey;
 
 if plot
+    if fc == 1
+        fig = figure();
+    end
+    
     subplot(2,2,1),surface(cMap');
     subplot(2,2,2),surface(Vmap');
     subplot(2,2,3),quiver(Ex',Ey');
     axis([0 nx 0 ny]);
     subplot(2,2,4),quiver(eFlowx',eFlowy');
     axis([0 nx 0 ny]);
+    
+    if fc == 1
+        f = getframe(fig);
+        [im,map] = rgb2ind(f.cdata,256,'nodither');
+        im(1,1,1,20) = 0;
+    else
+        f = getframe(fig);
+        im(:,:,1,fc) = rgb2ind(f.cdata,map,'nodither');
+    end
 end
 
 C0 = sum(eFlowx(1,:));
