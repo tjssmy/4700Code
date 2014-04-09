@@ -1,8 +1,11 @@
 % clear all
-% clearvars
+clearvars
+clearvars -GLOBAL
 close all
 % set(0,'DefaultFigureWindowStyle','docked')
 global C im fig map fc
+
+addpath ../geom2d/geom2d
 
 C.q_0 = 1.60217653e-19;             % electron charge
 C.hb = 1.054571596e-34;             % Dirac constant
@@ -19,31 +22,59 @@ ny = 50;
 Acond = 1;
 Bcond = 10;
 
-MaxRad = 5;
+SimType = 'e'
+
+Max = 5;
 ncircs = 20;
-doPlot = 1;
+doPlot = 0;
 
 
-for k = 1:2
-    MaxRad(k) = k*2
-    fc = k;
-    for i = 1:1
-        % V = 1 --> R = 1/I
-        Res(k,i)  = 1/GetCurrents(ncircs,MaxRad(k),nx,ny,Acond,Bcond,doPlot);
+if SimType == 'c'
+    
+    n=20;
+    nSims = 1;
+    Res = zeros(n,nSims);
+
+    for k = 1:n
+        Max(k) = k
+        fc = k;
+        for i = 1:nSims
+            % V = 1 --> R = 1/I
+            Res(k,i) = 1/GetCurrents(ncircs,Max(k),nx,ny,...
+                Acond,Bcond,doPlot,SimType);
+        end
     end
+else %if SimType == 'e'
+    
+    n=20;
+    nSims = 30;
+    Res = zeros(n,nSims);
+    
+    for k = 1:n
+        Max(k) = k*3
+        fc = k;
+        for i = 1:nSims
+            % V = 1 --> R = 1/I
+            Res(k,i)  = 1/GetCurrents(Max(k),10,nx,ny,...
+                Acond,Bcond,doPlot,SimType);
+        end
+    end
+    
 end
 
+
 if doPlot
-    imwrite(im,map,'imagefile.gif','DelayTime',100,'LoopCount',inf);
+    imwrite(im,map,'imagefile.gif','DelayTime',0.2,'LoopCount',inf);
+    figure
 end
 
 subplot(4,1,1),bar(Res(1,:))
-xl = sprintf('Simulation Number (MaxRad = %i)',MaxRad(1));
+xl = sprintf('Simulation Number (Num = %i)',Max(1));
 xlabel(xl);
 ylabel('Resistance');
 
-subplot(4,1,2),bar(Res(10,:))
-xl = sprintf('Simulation Number (MaxRad = %i)',MaxRad(10));
+subplot(4,1,2),bar(Res(n,:))
+xl = sprintf('Simulation Number (Num = %i)',Max(n));
 xlabel(xl);
 ylabel('Resistance');
 
@@ -52,15 +83,15 @@ ylabel('Resistance');
 AveCurr = mean(Res');
 StdCurr = std(Res');
 
-subplot(4,1,3),plot(MaxRad,AveCurr);
+subplot(4,1,3),plot(Max,AveCurr);
 hold on
-subplot(4,1,3),plot(MaxRad,AveCurr-StdCurr,'r');
-subplot(4,1,3),plot(MaxRad,AveCurr+StdCurr,'r');
-xlabel('MaxRad');
+subplot(4,1,3),plot(Max,AveCurr-StdCurr,'r');
+subplot(4,1,3),plot(Max,AveCurr+StdCurr,'r');
+xlabel('Num');
 ylabel('Resistance');
 hold off
 
-subplot(4,1,4),plot(MaxRad,StdCurr./AveCurr*100,'r');
-xlabel('MaxRad');
+subplot(4,1,4),plot(Max,StdCurr./AveCurr*100,'r');
+xlabel('Num');
 ylabel('Variance (% of mean)');
 

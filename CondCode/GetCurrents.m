@@ -1,22 +1,47 @@
-function [ Curr ] = GetCurrents(ncircs,MaxRad,nx,ny,Acond,Bcond,plot)
+function [ Curr ] = GetCurrents(ngeo,Max,nx,ny,Acond,Bcond,plot,SimType)
 global im fig fc map
 
-pcircs = rand(ncircs,2);
-pcircs(:,1) = pcircs(:,1)*nx;
-pcircs(:,2) = pcircs(:,2)*ny;
-rcircs = rand(ncircs,1)*MaxRad;
-rcircs2 = rcircs.^2;
 
-cMap = zeros(nx,ny);
-
-for i = 1:nx
-    for j = 1:ny
-        cMap(i,j) = Acond;
-        for p = 1:ncircs
-            dx = (pcircs(p,1)-i);
-            dy = (pcircs(p,2)-j);
-            if dx*dx + dy*dy < rcircs2(p)
-                cMap(i,j)= Bcond;
+if SimType == 'c'
+    pgeo = rand(ngeo,2);
+    pgeo(:,1) = pgeo(:,1)*nx;
+    pgeo(:,2) = pgeo(:,2)*ny;
+    rgeo = rand(ngeo,1)*Max;
+    rcircs2 = rgeo.^2;
+    
+    cMap = zeros(nx,ny);
+    
+    for i = 1:nx
+        for j = 1:ny
+            cMap(i,j) = Acond;
+            for p = 1:ngeo
+                dx = (pgeo(p,1)-i);
+                dy = (pgeo(p,2)-j);
+                if dx*dx + dy*dy < rcircs2(p)
+                    cMap(i,j)= Bcond;
+                end
+            end
+        end
+    end
+else %if SimType == 'e'
+    pgeo = rand(ngeo,3);
+    pgeo(:,1) = pgeo(:,1)*nx;
+    pgeo(:,2) = pgeo(:,2)*ny;
+    pgeo(:,3) = pgeo(:,2)*180;
+    rgeo = ones(ngeo,1)*Max;
+    
+    cMap = zeros(nx,ny);
+    
+    for i = 1:nx
+        i
+        for j = 1:ny
+            cMap(i,j) = Acond;
+            for p = 1:ngeo
+                point = [i, j];
+                el = [pgeo(p,1),pgeo(p,2),rgeo(p),rgeo(p)/4, pgeo(p,3)];
+                if isPointInEllipse(point, el)
+                    cMap(i,j)= Bcond;
+                end
             end
         end
     end
@@ -129,8 +154,12 @@ if plot
         fig = figure();
     end
     
-    subplot(2,2,1),surface(cMap');
-    subplot(2,2,2),surface(Vmap');
+    subplot(2,2,1),H = surf(cMap');
+    set(H, 'linestyle', 'none');
+    view(0,90)
+    subplot(2,2,2),H = surf(Vmap');
+    set(H, 'linestyle', 'none');
+    view(0,90)
     subplot(2,2,3),quiver(Ex',Ey');
     axis([0 nx 0 ny]);
     subplot(2,2,4),quiver(eFlowx',eFlowy');
@@ -139,7 +168,7 @@ if plot
     if fc == 1
         f = getframe(fig);
         [im,map] = rgb2ind(f.cdata,256,'nodither');
-        im(1,1,1,20) = 0;
+        im(1,1,1,2) = 0;
     else
         f = getframe(fig);
         im(:,:,1,fc) = rgb2ind(f.cdata,map,'nodither');
@@ -153,4 +182,3 @@ Curr = (C0 + Cnx)*0.5;
 
 
 end
-
