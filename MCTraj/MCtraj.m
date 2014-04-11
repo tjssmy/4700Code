@@ -2,8 +2,8 @@
 clearvars
 clearvars -GLOBAL
 close all
-set(0,'DefaultFigureWindowStyle','docked')
-global C im fig map fc
+% set(0,'DefaultFigureWindowStyle','docked')
+global C 
 
 addpath ../geom2d/geom2d
 
@@ -18,13 +18,13 @@ C.c = 299792458;                    % speed of light
 C.g = 9.80665 %metres (32.1740 ft) per s²
 
 nTime = 100;
-nTraj = 10000;
+nTraj = 10;
 nSims = 100;
 
 InitalAngle = 55*pi/180;
 PlotTraj = 1;
 MaxC = 10000;
-
+doPlot = 1;
 
 
 V0 = 1000;
@@ -32,14 +32,14 @@ g = 1
 c = 2;
 dt = 1;
 
-% Wind = @UniformRandWind;
-% WindParas = [10];
+Wind = @UniformRandWind;
+WindParas = [10];
 
 % Wind = @NormalRandWind;
-% WindParas = [1];
+% WindParas = [5];
 
-Wind = @ComplexRandWind;
-WindParas = [5];
+% Wind = @ComplexRandWind;
+% WindParas = [.35];
 
 
 xl =[];
@@ -53,7 +53,7 @@ for n = 1: nSims
 
     for c=2:MaxC
         
-        dvx = Wind(nTraj,WindParas);
+        dvx = Wind(nTraj,WindParas)*dt;
         Vx = Vx + dvx;
         dx = Vx*dt;
         
@@ -68,12 +68,12 @@ for n = 1: nSims
         end
     end
     
-    subplot(2,1,1),plot(x,y);
-    axis([0 13e5 0 4e5]);
-    hold on
-    
     xl = [xl x(end,:)];
-    subplot(2,1,2),hist(xl,100)
-    axis([0 13e5 0 50]);
-    pause(0.01);
+ 
 end
+
+if doPlot
+    imwrite(im,map,'imagefile.gif','DelayTime',0,'LoopCount',inf);
+    figure
+end
+

@@ -1,36 +1,40 @@
 function [ Wind ] = ComplexRandWind(nTraj,paras)
 
 % pdf
-% wind(x) = 0             x < 0 
+% wind(x) = 0               x < 0 
 
-% wind(x) = a             x < a
+% wind(x) = 1.0             x < a
 
-% wind(x) = a - (x-a)    
-% wind(x) = 2a - x        x < 2a
+% wind(x) = 1.0 - 1/a*(x-a) 
+% wind(x) = 2.0 - 1/a*x     x < 2a   
 
-% wind(x) = 0             x < inf
+% wind(x) = 0               x > 2a
 
 % cdf
-% c = a*x                                0 < c < a^2
-% c = a^2 - 2a^2 - 4a^2/2 + 2ax + x^2/2  
-% c = -3a^2 + 2ax + x^2/2                a^2 < c < 3a^2
-% c = a^2                                c > 3a^2
+% c = x                                           0 < c < a
+% c = a + 2(x) - 1/(2a)*(x)^2 - 2.0a + 1/(2a)*a^2  
+% c =  -1/2a + 2(x) - 1/(2a)*(x)^2                a < c < 1.5a
+% c = 1.5a                                        c > 1.5a
 
 a = paras(1);
-M = 3*a^2;
+M = 1.5*a;
 r = rand(1,nTraj)*M;
 
-
-ri = r < a^2;
-Wind(ri) = r(ri)/a;
-
-hist(Wind);
+ri = r < a;
+Wind(ri) = r(ri);
 
 rin = ~ri;
-%  0 = -(c+3a^2) + 2ax + x^2/2                a^2 < c < 3a^2
-Wind(rin) = -2*a + sqrt(4*a^2 + 4/2*(r(rin)+3*a^2));
+% -(c+1/2a) + 2(x) - 1/(2a)*(x)^2 = 0             
+A = -1/(2*a);
+B = 2;
+C = -(r(rin)+a/2);
+Wind(rin) = (-B + sqrt(B*B - 4*A*C))/(2*A);
 
-hist(Wind);
+
+% hist(Wind,50);
+% xlabel('Wind');
+% ylabel('number');
+Wind = -Wind;
 
 end
 
