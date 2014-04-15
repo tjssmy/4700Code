@@ -29,6 +29,7 @@ dx = x(2)-x(1);
 
 
 
+
 Rho = zeros(1,nx);
 lBC = 0;
 
@@ -41,6 +42,7 @@ n = zeros(nx,nx);
 
 Na = 1e18 * 1e6; % Const. 1e18/cm3 (100 cm/m)^3
 
+n0 = Na
 
 Dp = ones(1,nx).*Na;
 

@@ -26,7 +26,7 @@ for i = 1:nx
     if i == 1              % J(1) = 0;
         Gn(i,i) = -B(i);
         Gn(i,i+1) = A(i);
-    elseif i == nx         %(J(nx) = 0
+    elseif i == nx         % n = n0;
         Gn(i,nx-1) = -B(i-1);
         Gn(i,nx) = A(i-1);
     else
