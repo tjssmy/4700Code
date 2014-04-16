@@ -1,7 +1,7 @@
 function  FormGv(nx,lBC)
 global Gv Bv
 
-Gv = zeros(nx,nx);
+Gv = sparse(nx,nx);
 Bv = zeros(1,nx);
 
 for i = 1:nx
