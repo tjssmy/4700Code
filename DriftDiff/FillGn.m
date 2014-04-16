@@ -39,13 +39,13 @@ if ~SFG
     end
 else
     
-    % J(i) = - q n mu E + q Dn dn/dx  % i + 1/2 -- midpoint
+    % J(i) = q n mu E + q Dn dn/dx  % i + 1/2 -- midpoint
     v = muM.*Em;
     vi = v == 0;
     v(vi) = 1e-6;
     % n(i) = A exp(v(i)x/D(i)) + B
     
-    expF = exp(v.*dx./DnM);
+    expF = exp(-v.*dx./DnM);
     SCF = 1./(expF - 1);
     
     % J(i) = v(i) (n(i) expF(i) - n(i+1))*SCF(i)

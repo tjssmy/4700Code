@@ -21,7 +21,7 @@ DnSi = muSi*C.kb*300/C.q_0; % D = kt/q mu
 niSi = 1e10*1e6; % 1/cm^3 * (100 cm/m)^3 intrinsic concentration
 
 Coupled = 1;
-SCF = 0;
+SFG = 0;
 
 nx = 2000;
 l = 1e-6;
@@ -39,31 +39,33 @@ Rho = zeros(1,nx);
 
 
 FormGv(nx,0);
+nV = zeros(1,nx);
 
 mu = ones(1,nx)*muSi;
 Dn = ones(1,nx)*DnSi;
 
 n = zeros(nx,nx);
 
-Nd = 1e14 * 1e6; % Const. 1e18/cm3 (100 cm/m)^3
-
-Dp = ones(1,nx).*Nd; % doping
-
-n0 = (Dp + sqrt(Dp.^2 + 4* niSi*niSi))/2;
+Nd = 2e14 * 1e6; % Const. 1/cm3 (100 cm/m)^3
 
 MaxNumIter = 1000;
 
-nV = zeros(1,nx);
+Dp = ones(1,nx).*Nd; % doping
+n0 = (Dp + sqrt(Dp.^2 + 4* niSi*niSi))/2;
 nV(1) = n0(1);      % n0 at left end
 
-for lbc = 0:-1e-3:-40e-3
-    lbc
-    Bv(1) = lbc;
+lbc = -1e-3;
+
+Bv(1) = lbc;
+
+
+for c = 0:.01:1
+    
     
     for i = 1:MaxNumIter
         
-        V = Gv\(-dx^2/EpiSi*Rho' + Bv');
-        FillGn(nx,dx,SCF);
+        V = Gv\(-dx^2/EpiSi*Rho'*c + Bv');
+        FillGn(nx,dx,SFG);
         n = Gn\nV';
         if (Coupled)
             Rho = C.q_0*(Dp - n'); % update Rho
@@ -77,27 +79,88 @@ for lbc = 0:-1e-3:-40e-3
         JnDrift = C.q_0*muM.*nM'.*Em;
         
         
-        if abs(n - n0') < Dp'*1e-5
+        if abs(n - n0') < Dp'*1e-10
             break
         end
-        
-        
-        n0 = n';
+          n0 = n';
     end
-    
     subplot(2,2,1),plot(x,V);
-    axis([0 l -0.05 0.01])
+%     axis([0 l -0.05 0.01])
     hold on
     subplot(2,2,2),plot(xm,Em);
-    axis([0 l -15e4 1e4])
+%     axis([0 l -15e4 1e4])
     hold on 
     subplot(2,2,3),plot(x,n);
     hold on
-    axis([0 l 0 5e20])
+%     axis([0 l 0 5e20])
     subplot(2,2,4),plot(xm,JnDiff,'r');
     hold on
     subplot(2,2,4),plot(xm,JnDrift,'b');
-    axis([0 l -5e5 5e5])
+%     axis([0 l -5e5 5e5])
+        
+pause(0.00001);
+    
+    
+end
+
+
+
+for lbc = 0:-1e-3:-40e-3
+    Bv(1) = lbc;
+    
+    for i = 1:MaxNumIter
+        
+        V = Gv\(-dx^2/EpiSi*Rho' + Bv');
+        FillGn(nx,dx,SFG);
+        n = Gn\nV';
+        if (Coupled)
+            Rho = C.q_0*(Dp - n'); % update Rho
+            Rho(1) = 0;
+        end
+        
+        gradn = (n(2:nx)-n(1:nx-1))/dx;
+        nM = (n(2:nx)+n(1:nx-1))/2;
+        
+        JnDiff = C.q_0*DnM.*gradn';
+        JnDrift = C.q_0*muM.*nM'.*Em;
+        
+        
+        if abs(n - n0') < Dp'*1e-10
+            break
+        end
+       
+    subplot(2,2,1),plot(x,V);
+%     axis([0 l -0.05 0.01])
+    hold on
+    subplot(2,2,2),plot(xm,Em);
+%     axis([0 l -15e4 1e4])
+    hold on 
+    subplot(2,2,3),plot(x,n);
+    hold on
+%     axis([0 l 0 5e20])
+    subplot(2,2,4),plot(xm,JnDiff,'r');
+    hold on
+    subplot(2,2,4),plot(xm,JnDrift,'b');
+%     axis([0 l -5e5 5e5])
+        
+        n0 = n';
+    end
+
+    fprintf('lbc: %g iter: %i\n',lbc,i);
+    
+    subplot(2,2,1),plot(x,V);
+%     axis([0 l -0.05 0.01])
+    hold on
+    subplot(2,2,2),plot(xm,Em);
+%     axis([0 l -15e4 1e4])
+    hold on 
+    subplot(2,2,3),plot(x,n);
+    hold on
+%     axis([0 l 0 5e20])
+    subplot(2,2,4),plot(xm,JnDiff,'r');
+    hold on
+    subplot(2,2,4),plot(xm,JnDrift,'b');
+%     axis([0 l -5e5 5e5])
 %     Jerr = (JnDrift+JnDiff)/max(abs([JnDrift, JnDiff])*100);
 %     subplot(2,2,4),plot(xm,Jerr);
     
