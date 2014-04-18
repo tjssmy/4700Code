@@ -4,7 +4,7 @@ clearvars -GLOBAL
 close all
 format shorte
 set(0,'DefaultFigureWindowStyle','docked')
-global C Gn V mu Gv Dn Bv Em DnM muM A B
+global C Gn V Mun Gv Dn Bv Em DnM MunnM A B
 
 C.q_0 = 1.60217653e-19;             % electron charge
 C.hb = 1.054571596e-34;             % Dirac constant
@@ -12,12 +12,12 @@ C.h = C.hb*2*pi;                    % Planck constant
 C.m_0 = 9.10938215e-31;             % electron mass
 C.kb = 1.3806504e-23;               % Boltzmann constant
 C.eps_0 = 8.854187817e-12;          % vacuum permittivity
-C.mu_0 = 1.2566370614e-6;           % vacuum permeability
+C.Mun_0 = 1.2566370614e-6;           % vacuum permeability
 C.c = 299792458;                    % speed of light
 
 EpiSi = C.eps_0*11.68
-muSi = 450*1e-4 % cm2 V-1s-1 * 1/(100 cm/m)^2
-DnSi = muSi*C.kb*300/C.q_0; % D = kt/q mu 
+MunSi = 450*1e-4 % cm2 V-1s-1 * 1/(100 cm/m)^2
+DnSi = MunSi*C.kb*300/C.q_0; % D = kt/q Mun 
 niSi = 1e10*1e6; % 1/cm^3 * (100 cm/m)^3 intrinsic concentration
 
 Coupled = 1;
@@ -41,7 +41,7 @@ Rho = zeros(1,nx);
 FormGv(nx,0);
 nV = zeros(1,nx);
 
-mu = ones(1,nx)*muSi;
+Mun = ones(1,nx)*MunSi;
 Dn = ones(1,nx)*DnSi;
 
 n = zeros(nx,nx);
@@ -76,7 +76,7 @@ for c = 0:.01:1
         nM = (n(2:nx)+n(1:nx-1))/2;
         
         JnDiff = C.q_0*DnM.*gradn';
-        JnDrift = C.q_0*muM.*nM'.*Em;
+        JnDrift = C.q_0*MunM.*nM'.*Em;
         
         
         if abs(n - n0') < Dp'*1e-10
@@ -122,7 +122,7 @@ for lbc = 0:-1e-3:-40e-3
         nM = (n(2:nx)+n(1:nx-1))/2;
         
         JnDiff = C.q_0*DnM.*gradn';
-        JnDrift = C.q_0*muM.*nM'.*Em;
+        JnDrift = C.q_0*MunM.*nM'.*Em;
         
         
         if abs(n - n0') < Dp'*1e-10
