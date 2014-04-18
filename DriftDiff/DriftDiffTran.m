@@ -22,27 +22,25 @@ DnSi = MunSi*C.kb*300/C.q_0; % D = kt/q Mun
 MupSi = 450*1e-4; % cm2 V-1s-1 * 1/(100 cm/m)^2
 DpSi = MunSi*C.kb*300/C.q_0; % D = kt/q Mun
 tauSi = 1e-8;
-
 niSi = 1e10*1e6; % 1/cm^3 * (100 cm/m)^3 intrinsic concentration
 
-Coupled = 1;
-TwoCarriers = 1;
-RC = 1;
+Simulation = 'PNJct'
 
-nx = 201;
-l = 1e-6;
-x =linspace(0,l,nx);
+if strcmp(Simulation,'GaussianTwoCar')
+    eval('SetGaussian2CarParas');
+elseif strcmp(Simulation,'GaussianTwoCarRC')
+    eval('SetGaussian2CarParasRCOnly');
+elseif strcmp(Simulation,'GaussianSingle0V')
+    eval('SetGaussian1CarParas0V');
+elseif strcmp(Simulation,'GaussianSingle1V')
+    eval('SetGaussian1CarParas1V');
+elseif strcmp(Simulation,'ExpDoping')
+    eval('SetExpDopingParas');
+elseif strcmp(Simulation,'PNJct')
+    eval('SetPNJctParas');
+end
 
-dx = x(2)-x(1);
-xm = x(1:nx-1) + 0.5*dx;
-
-% Poisson equation d^2V/dx^2 = -1/EpiSi rho(x)
-% Gv V = -dx^2/EpiSi rho(x)
-% E = - dV/dx
-
-
-FormGv(nx,0);
-nV = zeros(1,nx);
+FormGv(nx,LVbc,RVbc); % Poisson equation set Gv and Bv
 [L,U] = lu(Gv);
 
 Mun = ones(1,nx)*MunSi;
@@ -57,40 +55,36 @@ MupM(1:nx-1) = (Mup(1:nx-1) + Mup(2:nx))/2;
 DpM(1:nx-1) = (Dp(1:nx-1) + Dp(2:nx))/2;
 p = zeros(1,nx);
 
-Nd = 1e16 * 1e6; % Const. 1/cm3 (100 cm/m)^3
-NetDoping = ones(1,nx).*Nd; % doping
-
-
 if TwoCarriers == 1
-    n0 = (NetDoping + sqrt(NetDoping.^2 + 4* niSi*niSi))/2;
-    p0 = niSi^2./n0;
+    ni = NetDoping >= 0;
+    n0(ni) = (NetDoping(ni) + sqrt(NetDoping(ni).^2 + 4* niSi*niSi))/2;
+    p0(ni)  = niSi^2./n0(ni);
+    
+    pi = ~ni;
+    p0(pi) = (-NetDoping(pi) + sqrt(NetDoping(pi).^2 + 4* niSi*niSi))/2;
+    n0(pi)  = niSi^2./p0(pi);
+    
+    
 else
     n0  = NetDoping;
     p0 = zeros(1,nx);
 end
 
-x0 = l/2;
-nw = l/20;
-n0 = n0 + 10e16*1e6*exp(-((x-x0)/nw).^2);
-
+n0 = n0 + npDisturbance;
 if TwoCarriers == 1
-    p0 = p0 + 10e16*1e6*exp(-((x-x0)/nw).^2);
+    p0 = p0 + npDisturbance;
 end
 
 divFn = zeros(1,nx);
 divFp = zeros(1,nx);
 
-dtMax = min(dx^2/2/max(Dn),dx^2/2/max(Dp));
-
 Rho = zeros(1,nx);
 if (Coupled)
     Rho = C.q_0*(NetDoping - n0 + p0); % update Rho
-    Rho(1) = 0;
+    
+    Rho(1) = 0; % 1 and nx are BC's
+    Rho(nx) = 0;
 end
-
-Rho(1) = 0;
-LVbc = 0;
-Bv(1) = LVbc;
 
 V = U\(L\(-dx^2/EpiSi*Rho' + Bv'));
 Em(1:nx-1) = -(V(2:nx) - V(1:nx-1))/dx;
@@ -99,6 +93,8 @@ Maxn = max(n0);
 Ld = sqrt(EpiSi/(C.q_0*Maxn));
 dxMax = Ld/5;
 
+dtMax = min(dx^2/2/max(Dn),dx^2/2/max(Dp));
+
 if MaxEm > 0
     dt = min([2*dx/MaxEm dtMax])/4;
 else
@@ -106,19 +102,16 @@ else
 end
 
 t = 0;
+
 n = n0;
 np = n0;
 
 p = p0;
 pp = p0;
 
-PlotVals(nx,dx,'on',[]);
+PlotVals(nx,dx,'on',l,TStop,PlotYAxis);
 
-TStop = 1200000*dt;
-PlDelt = 1000*dt;
-Plt0 = PlDelt;
-
-while t < TStop
+Plt0 = PlDelt;while t < TStop
 
     MaxEm = max(abs(Em));
     
@@ -160,7 +153,8 @@ while t < TStop
     
     if (Coupled)
         Rho = C.q_0*(NetDoping - n + p); % update Rho
-        Rho(1) = 0;
+        Rho(1) = 0; % 1 and nx are BC's
+        Rho(nx) = 0;
     end
     
     
@@ -170,7 +164,7 @@ while t < TStop
     t = t + dt;
     if t > Plt0
         fprintf('time: %g (%5.2g %%)\n',t,t/TStop*100);
-        PlotVals(nx,dx,'off',[]);
+        PlotVals(nx,dx,'off',l,TStop,PlotYAxis);
         Plt0 = Plt0 + PlDelt;
         pause(0.0001)
     end
@@ -179,4 +173,4 @@ while t < TStop
 end
 
 figure
-PlotVals(nx,dx,'off',[]);
+PlotVals(nx,dx,'off',l,TStop,PlotYAxis);
