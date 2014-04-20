@@ -5,7 +5,8 @@ close all
 format shorte
 set(0,'DefaultFigureWindowStyle','docked')
 global C V Mun Mup Gv Dn Dp Bv Em DnM MunM DpM MupM np pp x xm n p
-global Rho divFp divFn niSi TwoCarriers t
+global Rho divFp divFn niSi TwoCarriers t EpiSi n0 p0 tauSi
+global Coupled NetDoping l PlotYAxis
 
 C.q_0 = 1.60217653e-19;             % electron charge
 C.hb = 1.054571596e-34;             % Dirac constant
@@ -14,17 +15,24 @@ C.m_0 = 9.10938215e-31;             % electron mass
 C.kb = 1.3806504e-23;               % Boltzmann constant
 C.eps_0 = 8.854187817e-12;          % vacuum permittivity
 C.Mun_0 = 1.2566370614e-6;           % vacuum permeability
-C.c = 299792458;                    % speed of light
+C.c = 299792458;% speed of light
+
+Temp = 300;
+C.Vt = C.kb*Temp/C.q_0;
 
 EpiSi = C.eps_0*11.68;
 MunSi = 1400*1e-4; % cm2 V-1s-1 * 1/(100 cm/m)^2
-DnSi = MunSi*C.kb*300/C.q_0; % D = kt/q Mun
+DnSi = MunSi*C.kb*Temp/C.q_0; % D = kt/q Mun
 MupSi = 450*1e-4; % cm2 V-1s-1 * 1/(100 cm/m)^2
-DpSi = MunSi*C.kb*300/C.q_0; % D = kt/q Mun
+DpSi = MunSi*C.kb*Temp/C.q_0; % D = kt/q Mun
 tauSi = 1e-8;
 niSi = 1e10*1e6; % 1/cm^3 * (100 cm/m)^3 intrinsic concentration
 
-Simulation = 'PNJct'
+JBC = 0; % No flow BC by default
+RVbc = 0; % Ground Rightside 
+SecondSim = 0;
+
+Simulation = 'PNJctEqBias'
 
 if strcmp(Simulation,'GaussianTwoCar')
     eval('SetGaussian2CarParas');
@@ -38,6 +46,10 @@ elseif strcmp(Simulation,'ExpDoping')
     eval('SetExpDopingParas');
 elseif strcmp(Simulation,'PNJct')
     eval('SetPNJctParas');
+elseif strcmp(Simulation,'PNJctEq')
+    eval('SetPNJctParasEqBC');
+elseif strcmp(Simulation,'PNJctEqBias')
+    eval('SetPNJctParasEqBCBias');
 end
 
 FormGv(nx,LVbc,RVbc); % Poisson equation set Gv and Bv
@@ -111,65 +123,16 @@ pp = p0;
 
 PlotVals(nx,dx,'on',l,TStop,PlotYAxis);
 
-Plt0 = PlDelt;while t < TStop
 
-    MaxEm = max(abs(Em));
+
+SimulateFlow(TStop,nx,dx,dtMax,JBC,RC,U,L,PlDelt)
+
+if SecondSim == 1
     
-    if MaxEm > 0
-        dt = min([2*dx/MaxEm dtMax])/4;
-    else
-        dt = dtMax/4;
-    end
-    
-    V = U\(L\(-dx^2/EpiSi*Rho' + Bv'));
-    Em(1:nx-1) = -(V(2:nx) - V(1:nx-1))/dx;
-    
-    DivFn(nx,dx);
-    n = np + dt*divFn;
-    Maxn = max(n);
-    
-    if TwoCarriers == 1
-        DivFp(nx,dx);
-        p = pp + dt*divFp;
-        Maxp = max(p);
-        if RC
-            Urc = (n.*p - n0.*p0)./(n + p + 2*niSi)/tauSi;
-            n = n - dt*Urc;
-            p = p - dt*Urc;
-        end
-    else
-        Maxp = 0;
-    end
-    
-    Ldn = sqrt(EpiSi/(C.q_0*Maxn));
-    
-    if TwoCarriers == 1
-        Ldp = sqrt(EpiSi/(C.q_0*Maxp));
-    else
-        Ldp = 1e6;
-    end
-    
-    dxMax = min(Ldn,Ldp)/5;
-    
-    if (Coupled)
-        Rho = C.q_0*(NetDoping - n + p); % update Rho
-        Rho(1) = 0; % 1 and nx are BC's
-        Rho(nx) = 0;
-    end
-    
-    
-    np = n;
-    pp = p;
-    
-    t = t + dt;
-    if t > Plt0
-        fprintf('time: %g (%5.2g %%)\n',t,t/TStop*100);
-        PlotVals(nx,dx,'off',l,TStop,PlotYAxis);
-        Plt0 = Plt0 + PlDelt;
-        pause(0.0001)
-    end
-    
-    
+   FormGv(nx,LVbc2,RVbc); % Poisson equation set Gv and Bv
+   [L,U] = lu(Gv);
+
+    SimulateFlow(TStop2,nx,dx,dtMax,JBC,RC,U,L,PlDelt)
 end
 
 figure

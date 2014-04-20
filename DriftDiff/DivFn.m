@@ -1,4 +1,4 @@
-function DivFn(nx,dx)
+function DivFn(nx,dx,BC)
 global np Em DnM MunM divFn
     
     
@@ -21,9 +21,17 @@ global np Em DnM MunM divFn
     
     for i = 1:nx
         if i == 1
-            divFn(i) = (A(i)*np(i+1) - B(i)*np(i) - 0)/dx;
+            if BC == 0
+                divFn(i) = (A(i)*np(i+1) - B(i)*np(i) - 0)/dx;
+            else
+                divFn(i) = 0;
+            end
         elseif i == nx
-            divFn(i) = (0 - A(i-1)*np(i) + B(i-1)*np(i-1))/dx;
+            if BC == 0
+                divFn(i) = (0 - A(i-1)*np(i) + B(i-1)*np(i-1))/dx;
+            else
+                divFn(i) = 0;
+            end
         else
             divFn(i) = (A(i)*np(i+1) - B(i)*np(i) - ...
                 A(i-1)*np(i) + B(i-1)*np(i-1))/dx;

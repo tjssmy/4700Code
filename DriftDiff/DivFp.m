@@ -1,4 +1,4 @@
-function DivFp(nx,dx)
+function DivFp(nx,dx,BC)
 global pp Em DpM MupM divFp
     
     
@@ -21,9 +21,17 @@ global pp Em DpM MupM divFp
     
     for i = 1:nx
         if i == 1
-            divFp(i) = (A(i)*pp(i+1) - B(i)*pp(i) - 0)/dx;
+            if BC == 0
+                divFp(i) = (A(i)*pp(i+1) - B(i)*pp(i) - 0)/dx;
+            else
+                divFp(i) = 0;
+            end
         elseif i == nx
+            if BC == 0
             divFp(i) = (0 - A(i-1)*pp(i) + B(i-1)*pp(i-1))/dx;
+            else
+                divFp(i) = 0;
+            end
         else
             divFp(i) = (A(i)*pp(i+1) - B(i)*pp(i) - ...
                 A(i-1)*pp(i) + B(i-1)*pp(i-1))/dx;
