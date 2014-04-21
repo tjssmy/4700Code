@@ -27,7 +27,7 @@ JBC = 1;
 RVbc = 0;
 
 TStop = 8000000*1e-18;
-PlDelt = 40000*1e-18;
+PlDelt = 400000*1e-18;
 
 Phi =  C.Vt *log(Na*Nd/(niSi*niSi));
 W  = sqrt(2*EpiSi*(Nd+Nd)*(Phi)/(C.q_0*Nd*Na));
@@ -42,10 +42,13 @@ PlotYAxis = {[0 Phi+0.1] [0e5 40e5] [-20e2 40e2]...
     [-5e33 5e33] [-5e33 5e33] [-0e8 3e8] ...
     [1e-3 1e8] [0e-3 30e-3] [0 2.5e22]};
 
+PlotFile = 'PNJuncEq.gif';
+doPlotImage = 1
+
 
 SecondSim = 1;
 LVbc2 = 'fl';
-TStop2 = TStop +  800000*1e-18;
+TStop2 = TStop +  8000000*1e-18;
 
 fprintf('Phi: %g W: %g \n',Phi,W)
 

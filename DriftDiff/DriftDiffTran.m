@@ -6,7 +6,8 @@ format shorte
 set(0,'DefaultFigureWindowStyle','docked')
 global C V Mun Mup Gv Dn Dp Bv Em DnM MunM DpM MupM np pp x xm n p
 global Rho divFp divFn niSi TwoCarriers t EpiSi n0 p0 tauSi
-global Coupled NetDoping l PlotYAxis
+global Coupled NetDoping l PlotYAxis PlotSS im map
+global PlotCount doPlotImage
 
 C.q_0 = 1.60217653e-19;             % electron charge
 C.hb = 1.054571596e-34;             % Dirac constant
@@ -32,7 +33,12 @@ JBC = 0; % No flow BC by default
 RVbc = 0; % Ground Rightside 
 SecondSim = 0;
 
-Simulation = 'PNJctEqBias'
+PlotSS = 1;
+PlotFile = 'image.gif'
+PlotCount = 0;
+doPlotImage = 0;
+
+Simulation = 'GaussianTwoCar'
 
 if strcmp(Simulation,'GaussianTwoCar')
     eval('SetGaussian2CarParas');
@@ -135,5 +141,19 @@ if SecondSim == 1
     SimulateFlow(TStop2,nx,dx,dtMax,JBC,RC,U,L,PlDelt)
 end
 
-figure
-PlotVals(nx,dx,'off',l,TStop,PlotYAxis);
+
+if doPlotImage
+    imwrite(im,map,PlotFile,'DelayTime',0.2,'LoopCount',inf);
+end
+
+
+fig2 = figure('Position', [100, 100, 1049, 895]);
+PlotVals(nx,dx,'off',l,TStop,[]);
+
+if doPlotImage
+    f = getframe(fig2);
+    [im,map] = rgb2ind(f.cdata,256,'nodither');
+
+    filename = strcat('final-',PlotFile);
+    imwrite(im,map,filename);
+end

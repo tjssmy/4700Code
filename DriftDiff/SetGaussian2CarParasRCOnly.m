@@ -20,10 +20,14 @@ npDisturbance = 1e16*1e6*exp(-((x-x0)/nw).^2);
 LVbc = 0;
 RVbc = 0;
 
-TStop = 4200000*1e-18;
-PlDelt = 20000*1e-18;
+TStop = 14200000*1e-18;
+PlDelt = 100000*1e-18;
 
 PlotYAxis = {[-1e-15 2e-15] [-2e-9 2e-9] [-1.5e-12 1.5e-12]...
     [1e22 2e22] [0 1e22] [0 20e43]...
     [-20e33 15e33] [-2.5e34 2e34] [-1.1e8 1.1e8] ...
     [-1e8 1e8] [-10e-3 10e-3] [0 2e22]};
+
+
+doPlotImage =1 
+PlotFile = 'Gau2CarRC.gif';

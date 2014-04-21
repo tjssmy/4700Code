@@ -22,9 +22,12 @@ LVbc = 'fl';
 RVbc = 0;
 
 TStop = 42000000*1e-18;
-PlDelt = 200000*1e-18;
+PlDelt = 800000*1e-18;
 
 PlotYAxis = {[0 .1] [-2e5 2e5] [-1.5e2 1.5e2]...
     [0.5e21 2e22] [0 1e12] [0 20e32]...
     [-20e32 15e32] [-5e22 5e22] [-0e8 0.5e8] ...
     [-0e-3 1e-3] [0e-3 20e-3] [0 2e22]};
+
+doPlotImage =1 
+PlotFile = 'Exp.gif';

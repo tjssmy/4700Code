@@ -25,10 +25,14 @@ npDisturbance = 0e16*1e6*exp(-((x-x0)/nw).^2);
 LVbc = 'fl';
 RVbc = 0;
 
-TStop = 42000000*1e-18;
-PlDelt = 200000*1e-18;
+TStop = 10000000*1e-18;
+PlDelt = 100000*1e-18;
+
+PlotFile = 'PNJunc.gif';
+doPlotImage = 1
+
 
 PlotYAxis = {[0 0.3] [0e5 15e5] [-20e2 30e2]...
     [0e21 2.5e22] [0 1.1e22] [0 20e43]...
-    [-5e33 5e33] [-5e33 5e33] [-0e8 15e8] ...
-    [1e-3 5e8] [0e-3 30e-3] [0 2.5e22]};
+    [-5e33 5e33] [-5e33 5e33] [-0e8 5e8] ...
+    [0e-3 1e8] [-30e-4 30e-4] [0 2.5e22]};

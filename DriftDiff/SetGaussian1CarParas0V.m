@@ -21,9 +21,13 @@ LVbc = 0;
 RVbc = 0;
 
 TStop = 1200000*1e-18;
-PlDelt = 1000*1e-18;
+PlDelt = 10000*1e-18;
 
 PlotYAxis = {[0 1] [-2e6 2e6] [-2e3 0]...
     [1e22 2e22] [0 1e22] [0 20e43]...
     [-5e34 5e34] [0 20e33] [-6e8 6e8] ...
     [0 20e7] [0 1] [0 2e23]};
+
+
+doPlotImage =1 
+PlotFile = 'Gau1Car0V.gif';
