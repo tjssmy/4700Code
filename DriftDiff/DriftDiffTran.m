@@ -80,9 +80,7 @@ if TwoCarriers == 1
     
     pi = ~ni;
     p0(pi) = (-NetDoping(pi) + sqrt(NetDoping(pi).^2 + 4* niSi*niSi))/2;
-    n0(pi)  = niSi^2./p0(pi);
-    
-    
+    n0(pi)  = niSi^2./p0(pi);        
 else
     n0  = NetDoping;
     p0 = zeros(1,nx);
@@ -128,8 +126,6 @@ p = p0;
 pp = p0;
 
 PlotVals(nx,dx,'on',l,TStop,PlotYAxis);
-
-
 
 SimulateFlow(TStop,nx,dx,dtMax,JBC,RC,U,L,PlDelt)
 
