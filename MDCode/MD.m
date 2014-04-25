@@ -26,8 +26,8 @@ TStop = 10000*dt;
 InitDist = 0.0;
 Method = 'VE'; % VE -- verlot; FD -- Forward Difference
 
-AddParticle = 4;
-Ep = 10*C.q_0;
+AddParticle = 1;
+Ep = 5*C.q_0;
 
 Mass = 14*C.am; % Silicon
 AtomSpacing = 0.5430710e-9;
@@ -58,7 +58,7 @@ x = x + (rand(1,nAtoms)-0.5)*AtomSpacing*InitDist;
 y = y + (rand(1,nAtoms)-0.5)*AtomSpacing*InitDist;
 
 if AddParticle
-    PartAng = -pi/8;
+    PartAng = -pi/4;
     x0 = 1.57876*AtomSpacing;
     y0 = W+2.0*AtomSpacing;
     for p = 0:AddParticle-1
