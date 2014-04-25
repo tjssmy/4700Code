@@ -5,9 +5,11 @@ close all
 format shorte
 
 set(0,'DefaultFigureWindowStyle','docked')
-global C x y nAtoms Fx Fy Phi
-
-addpath ../geom2d/geom2d
+global C 
+global Vx Vy x y Fx Fy AtomSpacing 
+global Phi nAtoms time Mass0 Mass1 Pty0in Pty1in
+global LJEpsilon LJSigma Phi0 AtomType
+global MinX MaxX MinY MaxY PhiTot KETot
 
 C.q_0 = 1.60217653e-19;             % electron charge
 C.hb = 1.054571596e-34;             % Dirac constant
@@ -20,200 +22,128 @@ C.c = 299792458;                    % speed of light
 C.g = 9.80665; %metres (32.1740 ft) per s²
 C.am = 1.66053892e-27;
 
+MaxX = 0;
+MinX = 0;
+MaxY = 0;
+MinY = 0;
+nAtoms = 0;
+
 doPlot = 1;
 dt = 5e-15;
 TStop = 10000*dt;
 InitDist = 0.0;
 Method = 'VE'; % VE -- verlot; FD -- Forward Difference
 
-AddParticle = 1;
-Ep = 5*C.q_0;
+Mass0 = 14*C.am; % Silicon
+Mass1 = 5*C.am; % Argon
 
-Mass = 14*C.am; % Silicon
+
+
 AtomSpacing = 0.5430710e-9;
 LJSigma = AtomSpacing/2^(1/6);
 LJEpsilon = 1e-21;
 
-LAtoms = 10;
-WAtoms = 10;
-
-L = (LAtoms-1)*AtomSpacing*1.0;
-W = (WAtoms-1)*AtomSpacing*1.0;
 PhiCutoff = 3*AtomSpacing*1.1;
 
-nAtoms = LAtoms*WAtoms;
+T = 30;
 
-xp(1,:) = linspace(0,L,LAtoms);
-yp(1,:) = linspace(0,W,WAtoms);
+AddRectAtomicArray(10,10,0,0,0,0,0,T,0);
+% vy0 = -sqrt(0.02*Ep/Mass1);
+% AddRectAtomicArray(4,4,0,12*AtomSpacing,0,vy0,0,T,1);
+AddParticleStream(13,0,5*1.2*AtomSpacing,-pi/2,1,0.4*C.q_0);
 
-x = xp;
-y(1:LAtoms) = yp(1);
 
-for i = 1:WAtoms-1
-    x(i*LAtoms+1:(i+1)*LAtoms) = xp;
-    y(i*LAtoms+1:(i+1)*LAtoms) = yp(i+1);
-end
+MaxX = max(x)*1.5;
+MinX = min(x)*1.5;
 
-x = x + (rand(1,nAtoms)-0.5)*AtomSpacing*InitDist;
-y = y + (rand(1,nAtoms)-0.5)*AtomSpacing*InitDist;
-
-if AddParticle
-    PartAng = -pi/4;
-    x0 = 1.57876*AtomSpacing;
-    y0 = W+2.0*AtomSpacing;
-    for p = 0:AddParticle-1
-        nAtoms = nAtoms+1;
-        x(nAtoms) = x0 - 3*p*AtomSpacing*cos(PartAng);
-        y(nAtoms) = y0 - 3*p*AtomSpacing*sin(PartAng);
-    end
-end
+MaxY = max(y)*1.5;
+MinY = min(y)*1.5;
 
 Fx = zeros(1,nAtoms);
 Fy = zeros(1,nAtoms);
 Phi = zeros(1,nAtoms);
+dx = zeros(1,nAtoms);
+dy = zeros(1,nAtoms);
+dvx = zeros(1,nAtoms);
+dvy = zeros(1,nAtoms);
+
+Pty0in = AtomType == 0;
+Pty1in = AtomType == 1;
+
+nAtoms0 = sum(Pty0in);
+nAtoms1 = sum(Pty1in);
 
 GetForces(PhiCutoff,LJEpsilon,LJSigma);
 Phi0 = sum(Phi)/nAtoms/2;
-KE = Phi0 + LJEpsilon;
-T = KE/C.kb;
-T = 30;
-if T == 0
-    Vx(1:nAtoms) = 0;
-    Vy(1:nAtoms) = 0;
-else
-    std = sqrt(C.kb*T/Mass);
-    Vx = std*randn(1,nAtoms);
-    Vy = std*randn(1,nAtoms);
-end
-
-Vx = Vx - mean(Vx);
-Vy = Vy - mean(Vy);
 
 V2 = Vx.*Vx + Vy.*Vy;
-KEc = 1/2*Mass*mean(V2);
-Tc = KEc/C.kb;
-
-if AddParticle
-    V = sqrt(2*Ep/Mass);
-    for p = 1:AddParticle
-        Vx(nAtoms-AddParticle+p) = V*cos(PartAng);
-        Vy(nAtoms-AddParticle+p) = V*sin(PartAng);
-    end
-end
-
-V2 = Vx.*Vx + Vy.*Vy;
-MaxV = max(sqrt(V2));
-ScaleV = sqrt(L*L + W*W)/MaxV*0.5;
-
-subplot(2,2,1),plot(x,y,'o','markers',20);
-hold on
-subplot(2,2,1),quiver(x,y,Fx,Fy,0);
-hold off
-
-axis([-2*AtomSpacing,(LAtoms+2)*AtomSpacing,...
-    -2*AtomSpacing,(WAtoms+2)*AtomSpacing]);
+% KEc = 1/2*Mass*mean(V2);
+% Tc = KEc/C.kb;
 
 t = 0;
 c = 1;
+time(c) = 0;
 
 PhiTot(c) = sum(Phi)/2;
-time(c) = 0;
-KETot(c) = KE*nAtoms;
 
-subplot(2,2,3),plot(x,y,'o','markers',20);
-hold on
-subplot(2,2,3),quiver(x,y,Vx*ScaleV,Vy*ScaleV,0,'r');
-hold off
-axis([-2*AtomSpacing,(LAtoms+2)*AtomSpacing,...
-    -2*AtomSpacing,(WAtoms+2)*AtomSpacing]);
+KETot(c) = 1/2*Mass0*...
+    sum(Vx(Pty0in).*Vx(Pty0in)+Vy(Pty0in).*Vy(Pty0in))...
+    + 1/2*Mass1*...
+    sum(Vx(Pty1in).*Vx(Pty1in)+Vy(Pty1in).*Vy(Pty1in));
 
-subplot(2,2,2),plot(time,KETot);
-hold on
-subplot(2,2,2),plot(time,PhiTot+LJEpsilon*nAtoms,'g');
-subplot(2,2,2),plot(time,PhiTot+KETot+LJEpsilon*nAtoms,'k');
-%     axis([0 TStop 0e-22 3e-23]);
-
-AE = 1/2*Mass*V2 + Phi-Phi0;
-if AddParticle, AE(end) = 0;end
-% AE = Phi;
-subplot(2,2,4),scatter3(x,y,AE,ones(1,nAtoms)*300,AE);
-axis([-2*AtomSpacing,(LAtoms+2)*AtomSpacing,...
-    -2*AtomSpacing,(WAtoms+2)*AtomSpacing]);
-view(2);
+PlotVars(c);
 
 xp = x - dt*Vx;
 xpp = x - 2*dt*Vx;
 yp = y - dt*Vy;
 ypp = y - 2*dt*Vy;
 
+PlDelt = 10*dt;
+Plt0 = PlDelt;
+
 while t < TStop
     
     %     F = ma
     %     F = m dv/dt
-    %     dv = F/m dt
-    %     x = Vx*dt + F/m (dt)^2/2
-    time(c) = t;
+  
     GetForces(PhiCutoff,LJEpsilon,LJSigma);
     
     % Forward difference
     if Method == 'FD'
-        dvx = Fx*dt/Mass;
-        Vx = Vx + dvx;
-        dx = Vx*dt + Fx*dt^2/2/Mass;
+        %     dv = F/m dt
+        %     x = Vx*dt + F/m (dt)^2/2
         
-        dvy = Fy*dt/Mass;
+        dvx(Pty0in) = Fx(Pty0in)*dt/Mass0;
+        dvx(Pty1in) = Fx(Pty1in)*dt/Mass1;
+        
+        Vx = Vx + dvx;
+        dx(Pty0in) = Vx(Pty0in)*dt + Fx(Pty0in)*dt^2/2/Mass0;
+        dx(Pty1in) = Vx(Pty1in)*dt + Fx(Pty1in)*dt^2/2/Mass1;
+        
+        dvy(Pty0in) = Fy(Pty0in)*dt/Mass0;
+        dvy(Pty1in) = Fy(Pty1in)*dt/Mass1;
+        
         Vy = Vy + dvy;
+        
+        dy(Pty0in) = Vy(Pty0in)*dt + Fy(Pty0in)*dt^2/2/Mass0;
+        dy(Pty1in) = Vy(Pty1in)*dt + Fy(Pty1in)*dt^2/2/Mass1;
+        
         dy = Vy*dt + Fy*dt^2/2/Mass;
         
         x = xp + dx;
         y = yp + dy;
+        
     elseif Method == 'VE'
         
-        x = -xpp + 2*xp + dt^2/Mass*Fx;
-        y = -ypp + 2*yp + dt^2/Mass*Fy;
+        x(Pty0in) = -xpp(Pty0in) + 2*xp(Pty0in) + dt^2/Mass0*Fx(Pty0in);
+        x(Pty1in) = -xpp(Pty1in) + 2*xp(Pty1in) + dt^2/Mass1*Fx(Pty1in);
+        
+        y(Pty0in) = -ypp(Pty0in) + 2*yp(Pty0in) + dt^2/Mass0*Fy(Pty0in);
+        y(Pty1in) = -ypp(Pty1in) + 2*yp(Pty1in) + dt^2/Mass1*Fy(Pty1in);
         
         Vx = (x - xpp)/(2*dt);
         Vy = (y - ypp)/(2*dt);
     end
-    
-    V2 = Vx.*Vx + Vy.*Vy;
-    KE = 1/2*Mass*mean(V2);
-    KETot(c) = KE*nAtoms;
-    
-    T(c) = KE/C.kb;
-    
-    PhiTot(c) = sum(Phi)/2; % every pair contributes twice
-    
-    subplot(2,2,1),plot(x,y,'o','markers',20);
-    hold on
-    subplot(2,2,1),quiver(x,y,Fx,Fy,0);
-    hold off
-    axis([-2*AtomSpacing,(LAtoms+2)*AtomSpacing,...
-        -2*AtomSpacing,(WAtoms+2)*AtomSpacing]);
-    
-    
-    subplot(2,2,2),plot(time,KETot);
-    hold on
-    subplot(2,2,2),plot(time,PhiTot-Phi0*nAtoms,'g');
-    subplot(2,2,2),plot(time,PhiTot-Phi0*nAtoms+KETot,'k');
-    %     axis([0 TStop -0e-19 0.5e-19]);
-    
-    subplot(2,2,3),plot(x,y,'o','markers',20);
-    hold on
-    subplot(2,2,3),quiver(x,y,Vx*ScaleV,Vy*ScaleV,0,'r');
-    hold off
-    axis([-2*AtomSpacing,(LAtoms+2)*AtomSpacing,...
-        -2*AtomSpacing,(WAtoms+2)*AtomSpacing]);
-    
-    AE = 1/2*Mass*V2 + Phi-Phi0;
-    if AddParticle, AE(end) = 0;end
-    % AE = Phi;
-    subplot(2,2,4),scatter3(x,y,AE,ones(1,nAtoms)*300,AE);
-    axis([-2*AtomSpacing,(LAtoms+2)*AtomSpacing,...
-        -2*AtomSpacing,(WAtoms+2)*AtomSpacing]);
-    view(2);
-    
-    pause(0.00001)
     
     xpp = xp;
     ypp = yp;
@@ -223,4 +153,23 @@ while t < TStop
     
     c = c + 1;
     t  = t + dt;
+    time(c) = t;
+     
+    
+    PhiTot(c) = sum(Phi)/2;
+    
+    KETot(c) = 1/2*Mass0*...
+        sum(Vx(Pty0in).*Vx(Pty0in)+Vy(Pty0in).*Vy(Pty0in))...
+        + 1/2*Mass1*...
+        sum(Vx(Pty1in).*Vx(Pty1in)+Vy(Pty1in).*Vy(Pty1in));
+
+     if t > Plt0
+        fprintf('time: %g (%5.2g %%)\n',t,t/TStop*100);
+   
+        PlotVars(c);
+        
+        Plt0 = Plt0 + PlDelt;
+        pause(0.00001)
+     end
+    
 end
