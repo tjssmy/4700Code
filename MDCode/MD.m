@@ -5,11 +5,12 @@ close all
 format shorte
 
 set(0,'DefaultFigureWindowStyle','docked')
-global C 
-global Vx Vy x y Fx Fy AtomSpacing 
+global C
+global Vx Vy x y Fx Fy AtomSpacing
 global Phi nAtoms time Mass0 Mass1 Pty0in Pty1in
 global LJEpsilon LJSigma Phi0 AtomType
 global MinX MaxX MinY MaxY PhiTot KETot
+global nAtoms0 nAtoms1 T T0 T1
 
 C.q_0 = 1.60217653e-19;             % electron charge
 C.hb = 1.054571596e-34;             % Dirac constant
@@ -28,30 +29,10 @@ MaxY = 0;
 MinY = 0;
 nAtoms = 0;
 
+Limits = [];
 doPlot = 1;
-dt = 5e-15;
-TStop = 10000*dt;
-InitDist = 0.0;
-Method = 'VE'; % VE -- verlot; FD -- Forward Difference
 
-Mass0 = 14*C.am; % Silicon
-Mass1 = 5*C.am; % Argon
-
-
-
-AtomSpacing = 0.5430710e-9;
-LJSigma = AtomSpacing/2^(1/6);
-LJEpsilon = 1e-21;
-
-PhiCutoff = 3*AtomSpacing*1.1;
-
-T = 30;
-
-AddRectAtomicArray(10,10,0,0,0,0,0,T,0);
-% vy0 = -sqrt(0.02*Ep/Mass1);
-% AddRectAtomicArray(4,4,0,12*AtomSpacing,0,vy0,0,T,1);
-AddParticleStream(13,0,5*1.2*AtomSpacing,-pi/2,1,0.4*C.q_0);
-
+InitVStream
 
 MaxX = max(x)*1.5;
 MinX = min(x)*1.5;
@@ -91,7 +72,20 @@ KETot(c) = 1/2*Mass0*...
     + 1/2*Mass1*...
     sum(Vx(Pty1in).*Vx(Pty1in)+Vy(Pty1in).*Vy(Pty1in));
 
-PlotVars(c);
+
+V2_0 = (Vx(Pty0in).*Vx(Pty0in)+Vy(Pty0in).*Vy(Pty0in));
+V2_1 = (Vx(Pty1in).*Vx(Pty1in)+Vy(Pty1in).*Vy(Pty1in));
+
+
+E0 = mean(V2_0)*Mass0*0.5 + mean(Phi(Pty0in)/2-Phi0);
+E1 = mean(V2_1)*Mass0*0.5 + mean(Phi(Pty1in)/2-Phi0);
+
+E = (E0*nAtoms0 + E1*nAtoms1)/nAtoms;
+T(c) = E/C.kb;
+T0(c) = E0/C.kb;
+T1(c) = E1/C.kb;
+
+PlotVars(c,Limits);
 
 xp = x - dt*Vx;
 xpp = x - 2*dt*Vx;
@@ -105,7 +99,7 @@ while t < TStop
     
     %     F = ma
     %     F = m dv/dt
-  
+    
     GetForces(PhiCutoff,LJEpsilon,LJSigma);
     
     % Forward difference
@@ -154,7 +148,7 @@ while t < TStop
     c = c + 1;
     t  = t + dt;
     time(c) = t;
-     
+    
     
     PhiTot(c) = sum(Phi)/2;
     
@@ -162,14 +156,26 @@ while t < TStop
         sum(Vx(Pty0in).*Vx(Pty0in)+Vy(Pty0in).*Vy(Pty0in))...
         + 1/2*Mass1*...
         sum(Vx(Pty1in).*Vx(Pty1in)+Vy(Pty1in).*Vy(Pty1in));
-
-     if t > Plt0
+    
+    V2_0 = (Vx(Pty0in).*Vx(Pty0in)+Vy(Pty0in).*Vy(Pty0in));
+    V2_1 = (Vx(Pty1in).*Vx(Pty1in)+Vy(Pty1in).*Vy(Pty1in));
+    
+    
+    E0 = mean(V2_0)*Mass0*0.5 + mean(Phi(Pty0in));
+    E1 = mean(V2_1)*Mass0*0.5 + mean(Phi(Pty0in));
+    
+    E = (E0*nAtoms0 + E1*nAtoms1)/nAtoms;
+    T(c) = E/C.kb;
+    T0(c) = E0/C.kb;
+    T1(c) = E1/C.kb;
+    
+    if t > Plt0
         fprintf('time: %g (%5.2g %%)\n',t,t/TStop*100);
-   
-        PlotVars(c);
+        
+        PlotVars(c,Limits);
         
         Plt0 = Plt0 + PlDelt;
         pause(0.00001)
-     end
+    end
     
 end
