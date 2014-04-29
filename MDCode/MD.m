@@ -10,7 +10,8 @@ global Vx Vy x y Fx Fy AtomSpacing
 global Phi nAtoms time Mass0 Mass1 Pty0in Pty1in
 global LJEpsilon LJSigma Phi0 AtomType
 global MinX MaxX MinY MaxY PhiTot KETot
-global nAtoms0 nAtoms1 T T0 T1
+global nAtoms0 nAtoms1 T T0 T1 MarkerSize 
+global doPlotImage PlotCount map im PlotSize
 
 C.q_0 = 1.60217653e-19;             % electron charge
 C.hb = 1.054571596e-34;             % Dirac constant
@@ -28,11 +29,17 @@ MinX = 0;
 MaxY = 0;
 MinY = 0;
 nAtoms = 0;
-
+MarkerSize = 12;
 Limits = [];
 doPlot = 1;
-
-InitVStream
+doPlotImage = 0;
+PlotCount  = 0;
+PlotFile = 'image.gif';
+PlotSize = [100, 100, 1049, 895];
+% InitVStream
+% InitHCP
+% InitHCPBlob
+InitVStreamHCP
 
 MaxX = max(x)*1.5;
 MinX = min(x)*1.5;
@@ -68,7 +75,11 @@ time(c) = 0;
 PhiTot(c) = sum(Phi)/2;
 
 V2_0 = (Vx(Pty0in).*Vx(Pty0in)+Vy(Pty0in).*Vy(Pty0in));
-V2_1 = (Vx(Pty1in).*Vx(Pty1in)+Vy(Pty1in).*Vy(Pty1in));
+if nAtoms1
+    V2_1 = (Vx(Pty1in).*Vx(Pty1in)+Vy(Pty1in).*Vy(Pty1in));
+else 
+    V2_1 = 0;
+end
 
 KE0 = mean(V2_0)*Mass0*0.5;
 KE1 = mean(V2_1)*Mass1*0.5;
@@ -144,7 +155,11 @@ while t < TStop
     
     PhiTot(c) = sum(Phi)/2;
     V2_0 = (Vx(Pty0in).*Vx(Pty0in)+Vy(Pty0in).*Vy(Pty0in));
-    V2_1 = (Vx(Pty1in).*Vx(Pty1in)+Vy(Pty1in).*Vy(Pty1in));
+    if nAtoms1
+        V2_1 = (Vx(Pty1in).*Vx(Pty1in)+Vy(Pty1in).*Vy(Pty1in));
+    else 
+        V2_1 = 0;
+    end
     
     KE0 = mean(V2_0)*Mass0*0.5;
     KE1 = mean(V2_1)*Mass1*0.5;
@@ -153,9 +168,6 @@ while t < TStop
     T(c) = KETot(c)/nAtoms/C.kb;
     T0(c) = KE0/C.kb;
     T1(c) = KE1/C.kb;
-    
-    
-    
     
     if t > Plt0
         fprintf('time: %g (%5.2g %%)\n',t,t/TStop*100);
@@ -167,3 +179,10 @@ while t < TStop
     end
     
 end
+
+
+if doPlotImage
+    imwrite(im,map,PlotFile,'DelayTime',0.2,'LoopCount',inf);
+end
+
+

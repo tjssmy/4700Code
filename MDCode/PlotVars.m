@@ -2,13 +2,25 @@ function [ output_args ] = PlotVars(c,Limits)
 global Vx Vy L W x y Fx Fy C
 global Phi nAtoms time Mass0 Mass1 Pty0in Pty1in
 global LJEpsilon Phi0 PhiTot KETot MinX MaxX MinY MaxY
-global T T0 T1 ScaleV
+global T T0 T1 ScaleV MarkerSize doPlotImage PlotCount
+global PlotFig map im PlotSize
 
 if isempty(Limits)
     Limits = Limits;
 end
 
-MarkerSize = 12;
+
+if doPlotImage == 1
+    if PlotCount == 0
+        close all;
+        set(0,'DefaultFigureWindowStyle','normal')
+        PlotFig = figure('Position', PlotSize);
+        PlotCount = 1;
+    else
+        PlotCount = PlotCount+1;
+    end
+end
+
 
 V2 = Vx.*Vx + Vy.*Vy;
 MaxV = max(sqrt(V2));
@@ -74,6 +86,17 @@ hold on
 subplot(3,2,6),plot(time,T0,'b','linewidth',2);
 subplot(3,2,6),plot(time,T1,'g','linewidth',2);
 %
+
+if doPlotImage   
+    if PlotCount == 1
+        f = getframe(PlotFig);
+        [im,map] = rgb2ind(f.cdata,256,'nodither');
+        im(1,1,1,2) = 0;
+    else
+        f = getframe(PlotFig);
+        im(:,:,1,PlotCount) = rgb2ind(f.cdata,map,'nodither');
+    end
+end
 
 end
 

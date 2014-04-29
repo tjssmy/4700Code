@@ -1,7 +1,7 @@
-function AddRectAtomicArray(LAtoms,WAtoms,X0,Y0,VX0,VY0,InitDist,Temp,Type)
+function AddHCPAtomicArray(LAtoms,WAtoms,X0,Y0,VX0,VY0,RotAng,InitDist,Temp,Type)
 global C
-global x y AtomSpacing 
-global nAtoms  
+global x y AtomSpacing
+global nAtoms  MinX MaxX MinY MaxY
 global AtomType Vx Vy Mass0 Mass1
 
 if Type == 0
@@ -10,21 +10,27 @@ else
     Mass = Mass1;
 end
 
-L = (LAtoms-1)*AtomSpacing;
-W = (WAtoms-1)*AtomSpacing;
+L = ((LAtoms-1)+0.5)*AtomSpacing;
+W = (WAtoms-1)*sqrt(3)/2*AtomSpacing;
 
-numAtoms = LAtoms*WAtoms;
-
-xp(1,:) = linspace(0,L,LAtoms);
-yp(1,:) = linspace(0,W,WAtoms);
-
-x(nAtoms+1:nAtoms+LAtoms) = xp-L/2;
-y(nAtoms+1:nAtoms+LAtoms) = yp(1)-W/2;
-
-for i = 1:WAtoms-1
-    x(nAtoms+i*LAtoms+1:nAtoms+(i+1)*LAtoms) = xp-L/2;
-    y(nAtoms+i*LAtoms+1:nAtoms+(i+1)*LAtoms) = yp(i+1)-W/2;
+p =1;
+n = 4;
+for i=1:LAtoms
+    for j = 1:WAtoms
+        y(end+1) = (sqrt(3)*(j-1)*AtomSpacing)/2.0;
+        if rem(j,2) == 1
+            x(end+1) = (i-1)*AtomSpacing;
+        else
+            x(end+1) = AtomSpacing/2.0 + (i-1)*AtomSpacing;
+        end
+        p = p + 1;
+    end
 end
+
+x = x - L/2;
+y = y - W/2;
+
+numAtoms = p-1;
 
 x(nAtoms+1:nAtoms+numAtoms) = x(nAtoms+1:nAtoms+numAtoms) + ...
     (rand(1,numAtoms)-0.5)*AtomSpacing*InitDist + X0;
