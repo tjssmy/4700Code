@@ -2,7 +2,7 @@ function [ output_args ] = PlotVars(c,Limits)
 global Vx Vy L W x y Fx Fy C
 global Phi nAtoms time Mass0 Mass1 Pty0in Pty1in
 global LJEpsilon Phi0 PhiTot KETot MinX MaxX MinY MaxY
-global T T0 T1
+global T T0 T1 ScaleV
 
 if isempty(Limits)
     Limits = Limits;
@@ -14,7 +14,10 @@ V2 = Vx.*Vx + Vy.*Vy;
 MaxV = max(sqrt(V2));
 dx = MaxX - MinX;
 dy =  MaxY - MinY;
-ScaleV = sqrt(dx*dx + dy*dy)/MaxV*0.5;
+
+if c==1
+    ScaleV = sqrt(dx*dx + dy*dy)/MaxV*0.15;
+end
 
 subplot(3,2,1),plot(x(Pty0in),y(Pty0in),'bo','markers',...
     MarkerSize,'MarkerFaceColor','b');
@@ -66,10 +69,10 @@ subplot(3,2,2),plot(time,PhiTot+KETot+LJEpsilon*nAtoms,'k','linewidth',2);
 %     axis([0 TStop 0e-22 3e-23]);
 
 
-subplot(3,2,6),plot(time,T,'linewidth',2);
+subplot(3,2,6),plot(time,T,'k','linewidth',2);
 hold on
-subplot(3,2,6),plot(time,T0,'g','linewidth',2);
-subplot(3,2,6),plot(time,T1,'k','linewidth',2);
+subplot(3,2,6),plot(time,T0,'b','linewidth',2);
+subplot(3,2,6),plot(time,T1,'g','linewidth',2);
 %
 
 end

@@ -67,23 +67,16 @@ time(c) = 0;
 
 PhiTot(c) = sum(Phi)/2;
 
-KETot(c) = 1/2*Mass0*...
-    sum(Vx(Pty0in).*Vx(Pty0in)+Vy(Pty0in).*Vy(Pty0in))...
-    + 1/2*Mass1*...
-    sum(Vx(Pty1in).*Vx(Pty1in)+Vy(Pty1in).*Vy(Pty1in));
-
-
 V2_0 = (Vx(Pty0in).*Vx(Pty0in)+Vy(Pty0in).*Vy(Pty0in));
 V2_1 = (Vx(Pty1in).*Vx(Pty1in)+Vy(Pty1in).*Vy(Pty1in));
 
+KE0 = mean(V2_0)*Mass0*0.5;
+KE1 = mean(V2_1)*Mass1*0.5;
 
-E0 = mean(V2_0)*Mass0*0.5 + mean(Phi(Pty0in)/2-Phi0);
-E1 = mean(V2_1)*Mass0*0.5 + mean(Phi(Pty1in)/2-Phi0);
-
-E = (E0*nAtoms0 + E1*nAtoms1)/nAtoms;
-T(c) = E/C.kb;
-T0(c) = E0/C.kb;
-T1(c) = E1/C.kb;
+KETot(c) = (KE0*nAtoms0 + KE1*nAtoms1);
+T(c) = KETot(c)/nAtoms/C.kb;
+T0(c) = KE0/C.kb;
+T1(c) = KE1/C.kb;
 
 PlotVars(c,Limits);
 
@@ -92,7 +85,6 @@ xpp = x - 2*dt*Vx;
 yp = y - dt*Vy;
 ypp = y - 2*dt*Vy;
 
-PlDelt = 10*dt;
 Plt0 = PlDelt;
 
 while t < TStop
@@ -151,23 +143,19 @@ while t < TStop
     
     
     PhiTot(c) = sum(Phi)/2;
-    
-    KETot(c) = 1/2*Mass0*...
-        sum(Vx(Pty0in).*Vx(Pty0in)+Vy(Pty0in).*Vy(Pty0in))...
-        + 1/2*Mass1*...
-        sum(Vx(Pty1in).*Vx(Pty1in)+Vy(Pty1in).*Vy(Pty1in));
-    
     V2_0 = (Vx(Pty0in).*Vx(Pty0in)+Vy(Pty0in).*Vy(Pty0in));
     V2_1 = (Vx(Pty1in).*Vx(Pty1in)+Vy(Pty1in).*Vy(Pty1in));
     
+    KE0 = mean(V2_0)*Mass0*0.5;
+    KE1 = mean(V2_1)*Mass1*0.5;
     
-    E0 = mean(V2_0)*Mass0*0.5 + mean(Phi(Pty0in));
-    E1 = mean(V2_1)*Mass0*0.5 + mean(Phi(Pty0in));
+    KETot(c) = (KE0*nAtoms0 + KE1*nAtoms1);
+    T(c) = KETot(c)/nAtoms/C.kb;
+    T0(c) = KE0/C.kb;
+    T1(c) = KE1/C.kb;
     
-    E = (E0*nAtoms0 + E1*nAtoms1)/nAtoms;
-    T(c) = E/C.kb;
-    T0(c) = E0/C.kb;
-    T1(c) = E1/C.kb;
+    
+    
     
     if t > Plt0
         fprintf('time: %g (%5.2g %%)\n',t,t/TStop*100);
