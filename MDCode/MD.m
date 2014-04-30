@@ -11,7 +11,7 @@ global Phi nAtoms time Mass0 Mass1 Pty0in Pty1in
 global LJEpsilon LJSigma Phi0 AtomType
 global MinX MaxX MinY MaxY PhiTot KETot
 global nAtoms0 nAtoms1 T T0 T1 MarkerSize 
-global doPlotImage PlotCount map im PlotSize
+global doPlotImage PlotCount map im PlotSize ScaleV ScaleF
 
 C.q_0 = 1.60217653e-19;             % electron charge
 C.hb = 1.054571596e-34;             % Dirac constant
@@ -36,10 +36,17 @@ doPlotImage = 0;
 PlotCount  = 0;
 PlotFile = 'image.gif';
 PlotSize = [100, 100, 1049, 895];
+ScaleV = 0;
+ScaleF = 0;
+
+% Simulation initiallization
+% InitBlock
+% InitBlock0
+% InitBlock0FD
 % InitVStream
 % InitHCP
-% InitHCPBlob
-InitVStreamHCP
+InitHCPBlob
+% InitVStreamHCP
 
 MaxX = max(x)*1.5;
 MinX = min(x)*1.5;
@@ -125,8 +132,6 @@ while t < TStop
         dy(Pty0in) = Vy(Pty0in)*dt + Fy(Pty0in)*dt^2/2/Mass0;
         dy(Pty1in) = Vy(Pty1in)*dt + Fy(Pty1in)*dt^2/2/Mass1;
         
-        dy = Vy*dt + Fy*dt^2/2/Mass;
-        
         x = xp + dx;
         y = yp + dy;
         
@@ -182,7 +187,7 @@ end
 
 
 if doPlotImage
-    imwrite(im,map,PlotFile,'DelayTime',0.2,'LoopCount',inf);
+    imwrite(im,map,PlotFile,'DelayTime',0.05,'LoopCount',inf);
 end
 
 
