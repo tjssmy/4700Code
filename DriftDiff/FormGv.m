@@ -9,7 +9,7 @@ Gv = sparse(nx,nx);
 Bv = zeros(1,nx);
 
 for i = 1:nx
-    
+
     if i == 1
         if lBC == 'fl'
             Gv(i,i) = 1;
@@ -17,7 +17,7 @@ for i = 1:nx
         else
             Bv(i) = lBC;
             Gv(i,i) = 1;
-        end            
+        end
     elseif i == nx
         Bv(i) = rBC;
         Gv(i,i) = 1;  % fixed contact RVbc
@@ -29,4 +29,3 @@ for i = 1:nx
 end
 
 end
-

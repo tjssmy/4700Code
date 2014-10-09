@@ -14,7 +14,7 @@ elseif (x < x0+dx/2)
     U = a;
 elseif (x < x0+dx/2+dw)
     U = b;
-else 
+else
     U = a;
 end
 

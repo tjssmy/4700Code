@@ -1,4 +1,3 @@
-
 Coupled = 1;
 TwoCarriers = 1;
 RC = 1;
@@ -29,5 +28,5 @@ PlotYAxis = {[0 .1] [-2e5 2e5] [-1.5e2 1.5e2]...
     [-20e32 15e32] [-5e22 5e22] [-0e8 0.5e8] ...
     [-0e-3 1e-3] [0e-3 20e-3] [0 2e22]};
 
-doPlotImage =1 
+doPlotImage = 1;
 PlotFile = 'Exp.gif';

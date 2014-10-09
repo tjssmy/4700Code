@@ -48,4 +48,3 @@ LVbc2 = Phi-0.3;
 TStop2 = TStop +  80000000*1e-18;
 
 fprintf('Phi: %g W: %g \n',Phi,W)
-

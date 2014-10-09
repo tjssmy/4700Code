@@ -1,4 +1,3 @@
-
 Coupled = 1;
 TwoCarriers = 1;
 RC = 1;
@@ -29,8 +28,7 @@ TStop = 10000000*1e-18;
 PlDelt = 100000*1e-18;
 
 PlotFile = 'PNJunc.gif';
-doPlotImage = 1
-
+doPlotImage = 1;
 
 PlotYAxis = {[0 0.3] [0e5 15e5] [-20e2 30e2]...
     [0e21 2.5e22] [0 1.1e22] [0 20e43]...
