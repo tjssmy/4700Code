@@ -1,4 +1,3 @@
-
 Coupled = 1;
 TwoCarriers = 1;
 RC = 1;
@@ -28,6 +27,5 @@ PlotYAxis = {[0 1] [0 2e6] [-1e4 1e4]...
     [-5e34 15e34] [-20e33 20e33] [-1e8 4e8] ...
     [-20e7 20e7] [0 20e-3] [0 2e23]};
 
-
-doPlotImage =1 
+doPlotImage = 1;
 PlotFile = 'Gau2Car.gif';

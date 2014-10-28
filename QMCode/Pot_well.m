@@ -7,10 +7,10 @@ b = paras(4);
 
 if (x < x0-dx)
     U = a;
-elseif (x > x0+dx)
+elseif (x > x0 + dx)
     U = a;
-else 
-    U = b
+else
+    U = b;
 end
 
 end

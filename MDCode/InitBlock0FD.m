@@ -1,4 +1,3 @@
-
 doPlot = 1;
 dt = 15e-15;
 TStop = 5000*dt;
@@ -20,10 +19,10 @@ AddRectAtomicArray(10,10,0,0,0,0,0,T,0);
 
 Size = 8*AtomSpacing;
 Limits = [-Size +Size -Size +Size]; % square is good
-PlDelt = 5*dt;
-MarkerSize = 10
-PlotFile = 'Block0FD.gif'
-doPlotImage = 1
+PlDelt = 5 * dt;
+MarkerSize = 10;
+PlotFile = 'Block0FD.gif';
+doPlotImage = 1;
 PlotSize = [100, 100, 1049, 1049];
 ScaleV = 1e-11;
 ScaleF = 100;

@@ -30,15 +30,15 @@ tauSi = 1e-8;
 niSi = 1e10*1e6; % 1/cm^3 * (100 cm/m)^3 intrinsic concentration
 
 JBC = 0; % No flow BC by default
-RVbc = 0; % Ground Rightside 
+RVbc = 0; % Ground Rightside
 SecondSim = 0;
 
 PlotSS = 1;
-PlotFile = 'image.gif'
+PlotFile = 'image.gif';
 PlotCount = 0;
-doPlotImage = 0;
+doPlotImage = 0; % set to 1 to draw the image
 
-Simulation = 'PNJctEqBias'
+Simulation = 'PNJctEqBias';
 
 if strcmp(Simulation,'GaussianTwoCar')
     eval('SetGaussian2CarParas');
@@ -77,10 +77,10 @@ if TwoCarriers == 1
     ni = NetDoping >= 0;
     n0(ni) = (NetDoping(ni) + sqrt(NetDoping(ni).^2 + 4* niSi*niSi))/2;
     p0(ni)  = niSi^2./n0(ni);
-    
+
     pi = ~ni;
     p0(pi) = (-NetDoping(pi) + sqrt(NetDoping(pi).^2 + 4* niSi*niSi))/2;
-    n0(pi)  = niSi^2./p0(pi);        
+    n0(pi)  = niSi^2./p0(pi);
 else
     n0  = NetDoping;
     p0 = zeros(1,nx);
@@ -97,7 +97,6 @@ divFp = zeros(1,nx);
 Rho = zeros(1,nx);
 if (Coupled)
     Rho = C.q_0*(NetDoping - n0 + p0); % update Rho
-    
     Rho(1) = 0; % 1 and nx are BC's
     Rho(nx) = 0;
 end
@@ -114,7 +113,7 @@ dtMax = min(dx^2/2/max(Dn),dx^2/2/max(Dp));
 if MaxEm > 0
     dt = min([2*dx/MaxEm dtMax])/4;
 else
-    dt = dtMax/4
+    dt = dtMax/4;
 end
 
 t = 0;
@@ -130,9 +129,8 @@ PlotVals(nx,dx,'on',l,TStop,PlotYAxis);
 SimulateFlow(TStop,nx,dx,dtMax,JBC,RC,U,L,PlDelt)
 
 if SecondSim == 1
-    
-   FormGv(nx,LVbc2,RVbc); % Poisson equation set Gv and Bv
-   [L,U] = lu(Gv);
+    FormGv(nx,LVbc2,RVbc); % Poisson equation set Gv and Bv
+    [L,U] = lu(Gv);
 
     SimulateFlow(TStop2,nx,dx,dtMax,JBC,RC,U,L,PlDelt)
 end

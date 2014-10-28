@@ -1,4 +1,3 @@
-
 Coupled = 1;
 TwoCarriers = 1;
 RC = 1;
@@ -36,19 +35,16 @@ Wp = (W - Wn);
 
 LVbc = Phi;
 
-
 PlotYAxis = {[0 Phi+0.1] [0e5 40e5] [-20e2 40e2]...
     [0e21 2.5e22] [0 1.1e22] [0 20e43]...
     [-5e33 5e33] [-5e33 5e33] [-0e8 3e8] ...
     [1e-3 1e8] [0e-3 30e-3] [0 2.5e22]};
 
 PlotFile = 'PNJuncEq.gif';
-doPlotImage = 1
-
+doPlotImage = 1;
 
 SecondSim = 1;
 LVbc2 = 'fl';
 TStop2 = TStop +  8000000*1e-18;
 
 fprintf('Phi: %g W: %g \n',Phi,W)
-
