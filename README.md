@@ -1,4 +1,4 @@
-# ELEC 4700 MATLAB Demonstrations (test of windows)
+# ELEC 4700 MATLAB Demonstrations (test of windows2)
 
 The following repo includes a number of demonstrations for [ELEC 4700][elec4700]
 and [ELEC 4705][elec4705] written in MATLAB.
