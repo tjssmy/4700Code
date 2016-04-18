@@ -45,8 +45,9 @@ ScaleF = 0;
 % InitBlock0FD
 % InitVStream
 % InitHCP
-InitHCPBlob
+% InitHCPBlob
 % InitVStreamHCP
+InitHCPMeltSim
 
 MaxX = max(x) * 1.5;
 MinX = min(x) * 1.5;
@@ -143,7 +144,7 @@ while t < TStop
         y(Pty0in) = -ypp(Pty0in) + 2 * yp(Pty0in) + dt^2 / Mass0 * Fy(Pty0in);
         y(Pty1in) = -ypp(Pty1in) + 2 * yp(Pty1in) + dt^2 / Mass1 * Fy(Pty1in);
 
-        Vx = (x - xpp) / (2 * dt);
+        Vx = (x - xpp) / (2 * dt);%+ randn()*sqrt(1.38064852e-23*500/Mass0)
         Vy = (y - ypp) / (2 * dt);
     end
 
