@@ -40,14 +40,14 @@ ScaleV = 0;
 ScaleF = 0;
 
 % Simulation initiallization
-% InitBlock
+InitBlock
 % InitBlock0
 % InitBlock0FD
 % InitVStream
 % InitHCP
 % InitHCPBlob
 % InitVStreamHCP
-InitHCPMeltSim
+% InitHCPMeltSim
 
 MaxX = max(x) * 1.5;
 MinX = min(x) * 1.5;
@@ -144,7 +144,7 @@ while t < TStop
         y(Pty0in) = -ypp(Pty0in) + 2 * yp(Pty0in) + dt^2 / Mass0 * Fy(Pty0in);
         y(Pty1in) = -ypp(Pty1in) + 2 * yp(Pty1in) + dt^2 / Mass1 * Fy(Pty1in);
 
-        Vx = (x - xpp) / (2 * dt);%+ randn()*sqrt(1.38064852e-23*500/Mass0)
+        Vx = (x - xpp) / (2 * dt);
         Vy = (y - ypp) / (2 * dt);
     end
 
@@ -176,7 +176,7 @@ while t < TStop
     T1(c) = KE1 / C.kb;
 
     if t > Plt0
-        fprintf('time: %g (%5.2g %%)\n', t, t / TStop * 100);
+        fprintf('time: %5.3e (%6.2f%%)\n', t, t / TStop * 100);
 
         PlotVars(c, Limits);
 
@@ -186,9 +186,6 @@ while t < TStop
 
 end
 
-
 if doPlotImage
     imwrite(im, map, PlotFile, 'DelayTime', 0.05, 'LoopCount', inf);
 end
-
-
