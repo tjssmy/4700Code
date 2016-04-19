@@ -28,7 +28,7 @@ Max = 5;
 ncircs = 20;
 doPlot = 1; % set to 1 if you would like to draw the plot
 
-if SimType == 'c'
+if SimType == 'c' || SimType == 'r'
     n = 20;
     nSims = 5;
     Res = zeros(n, nSims);

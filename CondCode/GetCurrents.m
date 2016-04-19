@@ -22,6 +22,26 @@ if SimType == 'c'
             end
         end
     end
+elseif SimType == 'r'
+    pgeo = rand(ngeo,2);
+    pgeo(:,1) = pgeo(:,1)*nx;
+    pgeo(:,2) = pgeo(:,2)*ny;
+    dgeo = ones(ngeo,1)*Max;
+    
+    cMap = zeros(ny,nx);
+    
+    for i = 1:nx
+        for j = 1:ny
+            cMap(j,i) = Acond;
+            for p = 1:ngeo
+                dx = abs(pgeo(p, 1) - i);
+                dy = abs(pgeo(p, 2) - j);
+                if (dx < dgeo(p)) && (dy < dgeo(p))
+                    cMap(j, i) = Bcond;
+                end
+            end
+        end
+    end
 else %if SimType == 'e'
     pgeo = rand(ngeo, 3);
     pgeo(:, 1) = pgeo(:, 1) * nx;
