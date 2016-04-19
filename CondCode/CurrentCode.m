@@ -22,7 +22,7 @@ ny = 50;
 Acond = 1;
 Bcond = 10;
 
-SimType = 'e';
+SimType = 'c';
 
 Max = 5;
 ncircs = 20;
