@@ -3,7 +3,7 @@ clearvars
 clearvars -GLOBAL
 close all
 % set(0,'DefaultFigureWindowStyle','docked')
-global C fc
+global im fig fc map C 
 
 addpath ../geom2d/geom2d
 
@@ -22,7 +22,7 @@ ny = 50;
 Acond = 1;
 Bcond = 10;
 
-SimType = 'e';
+SimType = 'c';
 
 Max = 5;
 ncircs = 20;
@@ -30,34 +30,30 @@ doPlot = 1; % set to 1 if you would like to draw the plot
 
 if SimType == 'c'
     n = 20;
-    nSims = 1;
+    nSims = 5;
     Res = zeros(n, nSims);
-
     for k = 1:n
         Max(k) = k;
         fc = k;
         for i = 1:nSims
             % V = 1 --> R = 1/I
             Res(k,i) = 1/GetCurrents(ncircs,Max(k),nx,ny,...
-                Acond,Bcond,doPlot,SimType);
+                Acond,Bcond,doPlot,SimType,i);
         end
     end
 else %if SimType == 'e'
-
     n = 20;
-    nSims = 30;
+    nSims = 1;
     Res = zeros(n, nSims);
-
     for k = 1:n
         Max(k) = k * 3;
         fc = k;
         for i = 1:nSims
             % V = 1 --> R = 1/I
             Res(k,i) = 1 / GetCurrents(Max(k), 10, nx, ny,...
-                Acond, Bcond, doPlot, SimType);
+                Acond, Bcond, doPlot, SimType,i);
         end
     end
-
 end
 
 if doPlot

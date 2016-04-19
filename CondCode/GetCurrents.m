@@ -1,5 +1,5 @@
-function [ Curr ] = GetCurrents(ngeo, Max, nx, ny, Acond, Bcond, plot, SimType)
-global im fig fc map
+function [ Curr ] = GetCurrents(ngeo, Max, nx, ny, Acond, Bcond, plot, SimType,FigNum)
+global im fig fc map C
 
 if SimType == 'c'
     pgeo = rand(ngeo, 2);
@@ -8,16 +8,16 @@ if SimType == 'c'
     rgeo = rand(ngeo,1)*Max;
     rcircs2 = rgeo.^2;
 
-    cMap = zeros(nx,ny);
+    cMap = zeros(ny,nx);
 
     for i = 1:nx
         for j = 1:ny
-            cMap(i,j) = Acond;
+            cMap(j,i) = Acond;
             for p = 1:ngeo
                 dx = (pgeo(p, 1) - i);
                 dy = (pgeo(p, 2) - j);
-                if dx * dx + dy * dy < rcircs2(p)
-                    cMap(i, j) = Bcond;
+                if (dx^2 + dy^2) < rcircs2(p)
+                    cMap(j, i) = Bcond;
                 end
             end
         end
@@ -29,22 +29,21 @@ else %if SimType == 'e'
     pgeo(:, 3) = pgeo(:, 2) * 180;
     rgeo = ones(ngeo, 1) * Max;
 
-    cMap = zeros(nx, ny);
+    cMap = zeros(ny, nx);
 
     for i = 1:nx
         for j = 1:ny
-            cMap(i, j) = Acond;
+            cMap(j,i) = Acond;
             for p = 1:ngeo
-                point = [i, j];
+                point = [j,i];
                 el = [pgeo(p, 1), pgeo(p, 2),rgeo(p), rgeo(p) / 4, pgeo(p, 3)];
                 if isPointInEllipse(point, el)
-                    cMap(i, j)= Bcond;
+                    cMap(j,i)= Bcond;
                 end
             end
         end
     end
 end
-
 
 G = sparse(nx*ny);
 B = zeros(1,nx*ny);
@@ -65,9 +64,9 @@ for i = 1:nx
             nxp = j + (i) * ny;
             nyp = j + 1 + (i - 1) * ny;
 
-            rxm = (cMap(i, j) + cMap(i - 1, j)) / 2.0;
-            rxp = (cMap(i, j) + cMap(i + 1, j)) / 2.0;
-            ryp = (cMap(i, j) + cMap(i, j + 1)) / 2.0;
+            rxm = (cMap(j,i) + cMap(j,i-1)) / 2.0;
+            rxp = (cMap(j,i) + cMap(j,i+1)) / 2.0;
+            ryp = (cMap(j,i) + cMap(j+1,i)) / 2.0;
 
             G(n, n) = -(rxm+rxp+ryp);
             G(n, nxm) = rxm;
@@ -79,9 +78,9 @@ for i = 1:nx
             nxp = j + (i) * ny;
             nym = j - 1 + (i - 1) * ny;
 
-            rxm = (cMap(i, j) + cMap(i - 1, j)) / 2.0;
-            rxp = (cMap(i, j) + cMap(i + 1, j)) / 2.0;
-            rym = (cMap(i, j) + cMap(i, j - 1)) / 2.0;
+            rxm = (cMap(j,i) + cMap(j,i-1)) / 2.0;
+            rxp = (cMap(j,i) + cMap(j,i+1)) / 2.0;
+            rym = (cMap(j,i) + cMap(j-1,i)) / 2.0;
 
             G(n, n) = -(rxm + rxp + rym);
             G(n, nxm) = rxm;
@@ -93,10 +92,10 @@ for i = 1:nx
             nym = j-1 + (i-1)*ny;
             nyp = j+1 + (i-1)*ny;
 
-            rxm = (cMap(i,j) + cMap(i-1,j))/2.0;
-            rxp = (cMap(i,j) + cMap(i+1,j))/2.0;
-            rym = (cMap(i,j) + cMap(i,j-1))/2.0;
-            ryp = (cMap(i,j) + cMap(i,j+1))/2.0;
+            rxm = (cMap(j,i) + cMap(j,i-1))/2.0;
+            rxp = (cMap(j,i) + cMap(j,i+1))/2.0;
+            rym = (cMap(j,i) + cMap(j-1,i))/2.0;
+            ryp = (cMap(j,i) + cMap(j+1,i))/2.0;
 
             G(n,n) = -(rxm+rxp+rym+ryp);
             G(n,nxm) = rxm;
@@ -110,33 +109,9 @@ end
 
 V = G\B';
 
-Vmap = zeros(nx,ny);
-for i = 1:nx
-    for j = 1:ny
-        n = j + (i - 1) * ny;
+Vmap = reshape(V,[ny,nx]);
 
-        Vmap(i, j) = V(n);
-    end
-end
-
-for i = 1:nx
-    for j = 1:ny
-        if i == 1
-            Ex(i, j) = (Vmap(i + 1, j) - Vmap(i, j));
-        elseif i == nx
-            Ex(i, j) = (Vmap(i, j) - Vmap(i - 1, j));
-        else
-            Ex(i, j) = (Vmap(i + 1, j) - Vmap(i - 1, j)) * 0.5;
-        end
-        if j == 1
-            Ey(i, j) = (Vmap(i, j + 1) - Vmap(i, j));
-        elseif j == ny
-            Ey(i, j) = (Vmap(i, j) - Vmap(i, j - 1));
-        else
-            Ey(i, j) = (Vmap(i, j + 1) - Vmap(i, j - 1)) * 0.5;
-        end
-    end
-end
+[Ex,Ey] = gradient(Vmap,1,1);
 
 Ex = -Ex;
 Ey = -Ey;
@@ -148,18 +123,18 @@ if plot
     if fc == 1
         fig = figure();
     end
-
-    subplot(2, 2, 1), H = surf(cMap');
+    figure(FigNum)
+    subplot(2, 2, 1), H = surf(cMap);
     set(H, 'linestyle', 'none');
     view(0, 90)
-    subplot(2, 2, 2), H = surf(Vmap');
+    subplot(2, 2, 2), H = surf(Vmap);
     set(H, 'linestyle', 'none');
     view(0, 90)
-    subplot(2, 2, 3), quiver(Ex', Ey');
+    subplot(2, 2, 3), quiver(Ex, Ey);
     axis([0 nx 0 ny]);
-    subplot(2, 2, 4), quiver(eFlowx', eFlowy');
+    subplot(2, 2, 4), quiver(eFlowx, eFlowy);
     axis([0 nx 0 ny]);
-
+    
     if fc == 1
         f = getframe(fig);
         [im, map] = rgb2ind(f.cdata, 256, 'nodither');
@@ -170,8 +145,8 @@ if plot
     end
 end
 
-C0 = sum(eFlowx(1, :));
-Cnx = sum(eFlowx(nx, :));
+C0 = sum(eFlowx(:,1));
+Cnx = sum(eFlowx(:,ny));
 Curr = (C0 + Cnx) * 0.5;
 
 end
