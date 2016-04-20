@@ -153,29 +153,27 @@ if plot
     set(H, 'linestyle', 'none');
     view(0, 90)
     title('Conductivity');
-    xlabel('X Position (m)'); %The graph plots the index position
-    ylabel('Y Position (m)');
-    zlabel('Conductivity (S)')
+    xlabel('');
+    ylabel('');
     
     subplot(2, 2, 2), H = surf(Vmap');
     set(H, 'linestyle', 'none');
     view(0, 90)
     title('Potential');
-    xlabel('X Position (m)'); %The graph plots the index position
-    ylabel('Y Position (m)');
-    zlabel('Voltage (V)')
+    xlabel('');
+    ylabel('');
     
     subplot(2, 2, 3), quiver(Ex', Ey');
     axis([0 nx 0 ny]);
     title('Electric Field');
-    xlabel('X Position (m)'); %The graph plots the index position
-    ylabel('Y Position (m)');
+    xlabel('');
+    ylabel('');
     
     subplot(2, 2, 4), quiver(eFlowx', eFlowy');
     axis([0 nx 0 ny]);
     title('Electron Flow');
-    xlabel('X Position (m)'); %The graph plots the index position
-    ylabel('Y Position (m)');
+    xlabel('');
+    ylabel('');
 
     if fc == 1
         f = getframe(fig);

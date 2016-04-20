@@ -15,7 +15,7 @@ C.kb = 1.3806504e-23;               % Boltzmann constant
 C.eps_0 = 8.854187817e-12;          % vacuum permittivity
 C.mu_0 = 1.2566370614e-6;           % vacuum permeability
 C.c = 299792458;                    % speed of light
-C.g = 9.80665 %metres (32.1740 ft) per s²
+C.g = 9.80665; %metres (32.1740 ft) per s²
 
 nTime = 100;
 nTraj = 10;

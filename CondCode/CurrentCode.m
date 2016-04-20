@@ -16,8 +16,8 @@ C.eps_0 = 8.854187817e-12;          % vacuum permittivity
 C.mu_0 = 1.2566370614e-6;           % vacuum permeability
 C.c = 299792458;                    % speed of light
 
-nx = 100;
-ny = 50;
+nx = 100; %nx and ny are the bounds for the graphs made
+ny = 50; 
 
 Acond = 1;
 Bcond = 10;
