@@ -62,14 +62,20 @@ title('Atoms and Velocities')
 xlabel('X')
 ylabel('Y')
 
-AE(Pty0in) = 1 / 2 * Mass0 * V2(Pty0in) + Phi(Pty0in) - Phi0;
-AE(Pty1in) = 1 / 2 * Mass1 * V2(Pty1in) + Phi(Pty1in) - Phi0;
+AE0(Pty0in) = 1 / 2 * Mass0 * V2(Pty0in) + Phi(Pty0in) - Phi0;
+AE1(Pty1in) = 1 / 2 * Mass1 * V2(Pty1in) + Phi(Pty1in) - Phi0;
+AE1=AE1(AE1~=0);
 % if AddParticle, AE(end) = 0;end
 % AE = Phi;
-subplot(3, 2, 4),scatter3(x,y,AE,ones(1,nAtoms)*300,AE,'fill');
+num0=length(AE0);
+num1=length(AE1);
+subplot(3, 2, 4),scatter3(x(1:num0),y(1:num0),AE0,ones(1,num0)*300,AE0,'fill');
+hold on
+subplot(3, 2, 4),scatter3(x(num0+1:end),y(num0+1:end),AE1,ones(1,num1)*100,AE1,'fill');
 axis(Limits);
 view(2);
 title('Atom Energy (KE + Pot)')
+hold off
 
 subplot(3, 2, 5), plot(x(Pty0in), y(Pty0in), 'bo', 'markers',...
     MarkerSize, 'MarkerFaceColor', 'b');
@@ -85,12 +91,12 @@ subplot(3, 2, 6), plot(time, T, 'k', 'linewidth', 2);
 hold on
 subplot(3, 2, 6), plot(time, T0, 'b', 'linewidth', 2);
 subplot(3, 2, 6), plot(time, T1, 'g', 'linewidth', 2);
-%
+
 xlabel('time')
 ylabel('Temperature')
 title('Temperature: Each type and all')
 
-if doPlotImage
+if doPlotImage == 1
     if PlotCount == 1
         f = getframe(PlotFig);
         [im, map] = rgb2ind(f.cdata, 256, 'nodither');
