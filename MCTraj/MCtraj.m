@@ -42,11 +42,12 @@ WindParas = [10];
 
 m = 10;
 
-E = 0.5 * m .* (V0 * sin(InitalAngle))^2;
-initialEnergy = mean(E);
+E = 0.5 * m .* (V0 * sin(InitalAngle))^2; % Initial is kinetic energy, Ek
 
-Ek = zeros(1, nTraj);
-Eg = zeros(1, nTraj);
+initialEnergy = mean(E); % Calculate the Mean Initial Energy
+
+Ek = zeros(1, nTraj);  % Set kinetic energy of projectiles to 0
+Eg = zeros(1, nTraj);  % Set gravitional potential energy of projectiles to 0
 
 
 for n = 1: nSims
@@ -69,31 +70,34 @@ for n = 1: nSims
         x(c,:) = x(c - 1,:) + dx;
         y(c,:) = y(c - 1,:) + dy;
         
-        Eg = m .* g .* y(c,:);
-        Ek = E - (0.75 + 0.2 .* rand(1, nTraj)) .* Eg;
+        Eg = m .* g .* y(c,:);  % Calculate gravitational potential energy as Eg = m*g*y
         
-        if max(Ek) <= 0
+        randLoss = (0.75 + 0.2 .* rand(1, nTraj)); % Random energy loss between 75-95% due to factors
+                                                   % such as air resistance
+        Ek = E - randLoss .* Eg;  % Calculate kinetic energy as Ek = E - Eg, with energy loss
+        
+        if max(Ek) <= 0  % Check if maximum height has been reached, i.e. Ek = 0;
             
-            E = 0.85 .* abs(Eg);
+            E = 0.85 .* abs(Eg);  % Ek = 0, total energy is Eg (with some loss)
             
         end
         
-        if max(Eg) <= 0
+        if max(Eg) <= 0  % Check projectiles have reach ground level, i.e. Eg = 0
             
-            E = 0.6 .* abs(Ek);
-            Vy = sqrt(2 .* E .* m^-1);
-            
-        end
-        
-        if min(y(c)) < 0
-            
-            Ylt = y < 0;
-            y(Ylt) = 0;
+            E = 0.6 .* abs(Ek); % Eg = 0, total energy is Ek (with some loss)
+            Vy = sqrt(2 .* E .* m^-1);  % Calculate new take-off velocity using remaining Ek
             
         end
         
-        if E <= 0.005 .* initialEnergy            
-            break            
+        if min(y(c)) < 0  % Check if any projectiles are below ground level
+            
+            Ylt = y < 0;  % Determine which projectiles are below ground level
+            y(Ylt) = 0;   % Set projectiles below ground level to 0
+            
+        end
+        
+        if E <= 0.005 .* initialEnergy  % Check if remaining total energy is negligible         
+            break  % END SIMULATION IF TRUE
         end
         
     end
@@ -107,9 +111,13 @@ hold on;
 
 for i = 1 : nTraj
     
-    modifiedcomet(x(:,i),y(:,i),0.2,i);
+    modifiedcomet(x(:,i),y(:,i),0.2,i); % Plot projectiles using the function modifiedcomet.m
     pause(0.2);
+    
 end
 
 hold off;
 
+% Improvements can be made by modelling actual losses instead of random
+% energy loss. More projectiles can be simulated using plot(x,y) or by
+% improving the function modifiedcomet.m
