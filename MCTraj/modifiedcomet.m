@@ -1,13 +1,10 @@
 function modifiedcomet(varargin)
 %MODIFIEDCOMET  Comet-like trajectory, modified from original comet.m
-
 %   COMET(Y) displays an animated comet plot of the vector Y.
 %   COMET(X,Y) displays an animated comet plot of vector Y vs. X.
 %   COMET(X,Y,p) uses a comet of length p*length(Y).  Default is p = 0.10.
-
 %   COMET(X,Y,p,num) uses a comet of length p*length(Y), num determines the
 %   number of trajectories to plot. Max is 5.
-
 %   COMET(AX,...) plots into AX instead of GCA.
 %
 %   Example:
