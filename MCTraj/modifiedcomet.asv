@@ -1,13 +1,10 @@
 function modifiedcomet(varargin)
 %MODIFIEDCOMET  Comet-like trajectory, modified from original comet.m
-
 %   COMET(Y) displays an animated comet plot of the vector Y.
 %   COMET(X,Y) displays an animated comet plot of vector Y vs. X.
 %   COMET(X,Y,p) uses a comet of length p*length(Y).  Default is p = 0.10.
-
 %   COMET(X,Y,p,num) uses a comet of length p*length(Y), num determines the
 %   number of trajectories to plot. Max is 5.
-
 %   COMET(AX,...) plots into AX instead of GCA.
 %
 %   Example:
@@ -50,22 +47,23 @@ co = get(ax,'colororder');
 m = length(x);
 k = round(p*m);
 
-if size(co,1)>=3
-    if num == 1
-        colors = [ co(1,:);co(6,:);co(1,:)]; %First trajectory color
-    end
-    if num == 2
-        colors = [ co(2,:);co(6,:);co(2,:)]; %Second trajectory color
-    end
-    if num == 3
-        colors = [ co(3,:);co(6,:);co(3,:)]; %Third trajectory color
-    end
-    if num == 4
-        colors = [ co(4,:);co(6,:);co(4,:)]; %Fourth trajectory color
-    end
-    if num == 5
-        colors = [ co(5,:);co(6,:);co(5,:)]; %Fifth trajectory color
-    end
+colors = [ co(num,:);co(6,:);co(num,:)];
+% if size(co,1)>=3
+%     if num == 1
+%         colors = [ co(1,:);co(6,:);co(1,:)]; %First trajectory color
+%     end
+%     if num == 2
+%         colors = [ co(2,:);co(6,:);co(2,:)]; %Second trajectory color
+%     end
+%     if num == 3
+%         colors = [ co(3,:);co(6,:);co(3,:)]; %Third trajectory color
+%     end
+%     if num == 4
+%         colors = [ co(4,:);co(6,:);co(4,:)]; %Fourth trajectory color
+%     end
+%     if num == 5
+%         colors = [ co(5,:);co(6,:);co(5,:)]; %Fifth trajectory color
+%     end
     
     lstyle = '-';
 else
