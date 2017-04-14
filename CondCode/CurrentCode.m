@@ -53,6 +53,8 @@ else %if SimType == 'e'
         fc = k;
         for i = 1:nSims
             % V = 1 --> R = 1/I
+            Res(k,i) = 1 / GetCurrents(Max(k), 10, nx, ny,...
+                Acond, Bcond, doPlot, SimType);
             Res(k,i) = 1 / GetCurrents2(Max(k), 10, nx, ny,...
                 Acond, Bcond, doPlot, SimType);
         end
