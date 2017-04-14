@@ -45,7 +45,7 @@ if SimType == 'c'
 else %if SimType == 'e'
 
     n = 20;
-    nSims = 1;
+    nSims = 30;
     Res = zeros(n, nSims);
 
     for k = 1:n
@@ -54,8 +54,6 @@ else %if SimType == 'e'
         for i = 1:nSims
             % V = 1 --> R = 1/I
             Res(k,i) = 1 / GetCurrents(Max(k), 10, nx, ny,...
-                Acond, Bcond, doPlot, SimType);
-            Res(k,i) = 1 / GetCurrents2(Max(k), 10, nx, ny,...
                 Acond, Bcond, doPlot, SimType);
         end
     end
