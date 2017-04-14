@@ -38,7 +38,7 @@ if SimType == 'c'
         fc = k;
         for i = 1:nSims
             % V = 1 --> R = 1/I
-            Res(k,i) = 1/GetCurrents2(ncircs,Max(k),nx,ny,...
+            Res(k,i) = 1/GetCurrents(ncircs,Max(k),nx,ny,...
                 Acond,Bcond,doPlot,SimType);
         end
     end
