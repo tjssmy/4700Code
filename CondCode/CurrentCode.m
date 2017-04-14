@@ -38,14 +38,14 @@ if SimType == 'c'
         fc = k;
         for i = 1:nSims
             % V = 1 --> R = 1/I
-            Res(k,i) = 1/GetCurrents(ncircs,Max(k),nx,ny,...
+            Res(k,i) = 1/GetCurrents2(ncircs,Max(k),nx,ny,...
                 Acond,Bcond,doPlot,SimType);
         end
     end
 else %if SimType == 'e'
 
     n = 20;
-    nSims = 30;
+    nSims = 1;
     Res = zeros(n, nSims);
 
     for k = 1:n
@@ -53,12 +53,14 @@ else %if SimType == 'e'
         fc = k;
         for i = 1:nSims
             % V = 1 --> R = 1/I
-            Res(k,i) = 1 / GetCurrents(Max(k), 10, nx, ny,...
+            Res(k,i) = 1 / GetCurrents2(Max(k), 10, nx, ny,...
                 Acond, Bcond, doPlot, SimType);
         end
     end
 
 end
+
+global im map;
 
 if doPlot
     imwrite(im, map, 'imagefile.gif', 'DelayTime', 0.2, 'LoopCount', inf);
