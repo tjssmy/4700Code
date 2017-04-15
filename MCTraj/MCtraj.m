@@ -42,7 +42,7 @@ WindParas = [10];
 
 
 xl = [];
-
+figure;
 for n = 1: nSims
     x(1, :) = zeros(1, nTraj);
     y(1, :) = zeros(1, nTraj);
@@ -68,10 +68,24 @@ for n = 1: nSims
     end
 
     xl = [xl x(end, :)];
+    histogram(xl,100)
+    title(['Simulation = ' num2str(n)])
+    axis([4e5 14e5 1 35])
+    xlabel('xl')
+    ylabel('count')
+    drawnow
+    frame = getframe(1);
+    im{n} = frame2im(frame);
 end
-
+close;
+%figure;
 if doPlot
-    imwrite(im, map, 'imagefile.gif', 'DelayTime', 0, 'LoopCount', inf);
-    figure
+    for n = 1:nSims
+    [A,map] = rgb2ind(im{n},256);
+        if n ==1
+            imwrite(A, map, 'imagefile.gif', 'gif', 'DelayTime', 0.2, 'LoopCount', inf);
+        else 
+            imwrite(A, map, 'imagefile.gif', 'gif', 'DelayTime', 0.2, 'WriteMode', 'append');
+        end
+    end
 end
-
