@@ -1,4 +1,3 @@
-
 Coupled = 1;
 TwoCarriers = 1;
 RC = 1;
@@ -47,4 +46,4 @@ SecondSim = 1;
 LVbc2 = Phi-0.3;
 TStop2 = TStop +  80000000*1e-18;
 
-fprintf('Phi: %g W: %g \n',Phi,W)
+fprintf('Phi: %g W: %g Wn: %g Wp: %g \n',Phi,W,Wn,Wp) 
