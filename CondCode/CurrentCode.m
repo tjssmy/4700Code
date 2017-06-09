@@ -63,6 +63,7 @@ end
 if doPlot
     imwrite(im, map, 'imagefile.gif', 'DelayTime', 0.2, 'LoopCount', inf);
     figure
+    hold on
 end
 
 subplot(4, 1, 1), bar(Res(1, :))
@@ -89,3 +90,7 @@ hold off
 subplot(4, 1, 4), plot(Max, StdCurr./ AveCurr * 100, 'r');
 xlabel('Num');
 ylabel('Variance (% of mean)');
+
+
+
+
