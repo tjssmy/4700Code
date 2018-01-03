@@ -41,13 +41,14 @@ ScaleF = 0;
 
 % Simulation initiallization
 % InitBlock
+InitCirc
 % InitBlock0
 % InitBlock0FD
 % InitVStream
 % InitHCP
 % InitHCPBlob
 % InitVStreamHCP
-InitHCPMeltSim
+% InitHCPMeltSim
 
 MaxX = max(x) * 1.5;
 MinX = min(x) * 1.5;
