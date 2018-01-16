@@ -39,11 +39,14 @@ PlotCount = 0;
 doPlotImage = 0; % set to 1 to draw the image
 
 Simulation = 'PNJctEqBias';
+% Simulation = 'GaussianTwoCarRCLinGrad';
 
 if strcmp(Simulation,'GaussianTwoCar')
     eval('SetGaussian2CarParas');
 elseif strcmp(Simulation,'GaussianTwoCarRC')
     eval('SetGaussian2CarParasRCOnly');
+elseif strcmp(Simulation,'GaussianTwoCarRCLinGrad')
+    eval('SetGaussian2CarParasRCOnlyLinGrad');
 elseif strcmp(Simulation,'GaussianSingle0V')
     eval('SetGaussian1CarParas0V');
 elseif strcmp(Simulation,'GaussianSingle1V')
@@ -141,7 +144,7 @@ if doPlotImage
 end
 
 
-fig2 = figure('Position', [100, 100, 1049, 895]);
+% fig2 = figure('Position', [100, 100, 1049, 895]);
 PlotVals(nx,dx,'off',l,TStop,[]);
 
 if doPlotImage

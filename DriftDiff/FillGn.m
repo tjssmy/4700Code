@@ -1,7 +1,7 @@
 function FillGn(nx,dx,SFG)
-global Gn n mu Dn V Em DnM muM A B
+global Gn n Mun Dn V Em DnM MunM A B
 
-    muM(1:nx-1) = (mu(1:nx-1) + mu(2:nx))/2;
+    MunM(1:nx-1) = (Mun(1:nx-1) + Mun(2:nx))/2;
     DnM(1:nx-1) = (Dn(1:nx-1) + Dn(2:nx))/2;
 
     Em(1:nx-1) = -(V(2:nx) - V(1:nx-1))/dx;
@@ -22,8 +22,8 @@ if ~SFG
     % J(i) - J(i-1) = 0
     %  A(i) n(i+1) - B(i) n(i) -  A(i-1) n(i) + B(i-1) n(i-1) = 0
 
-    A = DnM/dx + muM.*Em/2;
-    B = DnM/dx - muM.*Em/2;
+    A = DnM/dx + MunM.*Em/2;
+    B = DnM/dx - MunM.*Em/2;
 
     for i = 1:nx
         if i == 1
@@ -40,7 +40,7 @@ if ~SFG
 else
 
     % J(i) = q n mu E + q Dn dn/dx  % i + 1/2 -- midpoint
-    v = muM.*Em;
+    v = MunM.*Em;
     vi = v == 0;
     v(vi) = 1e-6;
     % n(i) = A exp(v(i)x/D(i)) + B

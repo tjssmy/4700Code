@@ -23,30 +23,30 @@ while t < TStop
     DivFn(nx,dx,JBC);
     n = np + dt*divFn;
 
-    % Maxn = max(n);
+    Maxn = max(n);
 
-    % if TwoCarriers == 1
-    %     DivFp(nx,dx,JBC);
-    %     p = pp + dt*divFp;
-    %     Maxp = max(p);
-    %     if RC
-    %         Urc = (n.*p - n0.*p0)./(n + p + 2*niSi)/tauSi;
-    %         n = n - dt*Urc;
-    %         p = p - dt*Urc;
-    %     end
-    % else
-    %     Maxp = 0;
-    % end
+    if TwoCarriers == 1
+        DivFp(nx,dx,JBC);
+        p = pp + dt*divFp;
+        Maxp = max(p);
+        if RC
+            Urc = (n.*p - n0.*p0)./(n + p + 2*niSi)/tauSi;
+            n = n - dt*Urc;
+            p = p - dt*Urc;
+        end
+    else
+        Maxp = 0;
+    end
 
-    % Ldn = sqrt(EpiSi/(C.q_0*Maxn));
+    Ldn = sqrt(EpiSi/(C.q_0*Maxn));
 
-    % if TwoCarriers == 1
-    %     Ldp = sqrt(EpiSi/(C.q_0*Maxp));
-    % else
-    %     Ldp = 1e6;
-    % end
+    if TwoCarriers == 1
+        Ldp = sqrt(EpiSi/(C.q_0*Maxp));
+    else
+        Ldp = 1e6;
+    end
 
-    % dxMax = min(Ldn,Ldp)/5;
+    dxMax = min(Ldn,Ldp)/5;
 
     if (Coupled)
         Rho = C.q_0*(NetDoping - n + p); % update Rho

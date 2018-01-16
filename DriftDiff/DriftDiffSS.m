@@ -4,7 +4,7 @@ clearvars -GLOBAL
 close all
 format shorte
 set(0, 'DefaultFigureWindowStyle', 'docked')
-global C Gn V Mun Gv Dn Bv Em DnM
+global C Gn V Mun MunM Gv Dn Bv Em DnM
 
 C.q_0 = 1.60217653e-19;             % electron charge
 C.hb = 1.054571596e-34;             % Dirac constant
@@ -36,7 +36,7 @@ xm = x(1:nx-1) + 0.5*dx;
 
 Rho = zeros(1,nx);
 
-FormGv(nx,0);
+FormGv(nx,0,0);
 nV = zeros(1,nx);
 
 Mun = ones(1,nx)*MunSi;
@@ -57,9 +57,9 @@ lbc = -1e-3;
 Bv(1) = lbc;
 
 for c = 0:.01:1
-
+    
     for i = 1:MaxNumIter
-
+        
         V = Gv\(-dx^2/EpiSi*Rho'*c + Bv');
         FillGn(nx,dx,SFG);
         n = Gn\nV';
@@ -67,41 +67,60 @@ for c = 0:.01:1
             Rho = C.q_0*(Dp - n'); % update Rho
             Rho(1) = 0;
         end
-
+        
         gradn = (n(2:nx)-n(1:nx-1))/dx;
         nM = (n(2:nx)+n(1:nx-1))/2;
-
+        
         JnDiff = C.q_0*DnM.*gradn';
         JnDrift = C.q_0*MunM.*nM'.*Em;
-
+        
         if abs(n - n0') < Dp'*1e-10
             break
         end
-          n0 = n';
+        n0 = n';
     end
     subplot(2,2,1), plot(x, V);
-%     axis([0 l -0.05 0.01])
+    xlabel('x')
+    ylabel('V')
+    title('V')
+    %     axis([0 l -0.05 0.01])
     hold on
     subplot(2,2,2), plot(xm, Em);
-%     axis([0 l -15e4 1e4])
+    xlabel('x')
+    ylabel('E')
+    title('E')
+    
+    %     axis([0 l -15e4 1e4])
     hold on
     subplot(2,2,3), plot(x, n);
+    xlabel('x')
+    ylabel('n')
+    title('n')
+    
     hold on
-%     axis([0 l 0 5e20])
+    %     axis([0 l 0 5e20])
     subplot(2,2,4), plot(xm, JnDiff,'r');
+    xlabel('x')
+    ylabel('Jn')
+    title('JnDiff/Diff')
+    
     hold on
     subplot(2,2,4), plot(xm, JnDrift,'b');
-%     axis([0 l -5e5 5e5])
-
-pause(0.00001);
-
+    xlabel('x')
+    ylabel('Jn')
+    title('JnDrift/Diff')
+    
+    %     axis([0 l -5e5 5e5])
+    
+    pause(0.00001);
+    
 end
 
 for lbc = 0:-1e-3:-40e-3
     Bv(1) = lbc;
-
+    
     for i = 1:MaxNumIter
-
+        
         V = Gv\(-dx^2/EpiSi*Rho' + Bv');
         FillGn(nx,dx,SFG);
         n = Gn\nV';
@@ -109,53 +128,88 @@ for lbc = 0:-1e-3:-40e-3
             Rho = C.q_0*(Dp - n'); % update Rho
             Rho(1) = 0;
         end
-
+        
         gradn = (n(2:nx)-n(1:nx-1))/dx;
         nM = (n(2:nx)+n(1:nx-1))/2;
-
+        
         JnDiff = C.q_0*DnM.*gradn';
         JnDrift = C.q_0*MunM.*nM'.*Em;
-
-
+        
+        
         if abs(n - n0') < Dp'*1e-10
             break
         end
-
-    subplot(2,2,1), plot(x, V);
-%     axis([0 l -0.05 0.01])
-    hold on
-    subplot(2,2,2), plot(xm, Em);
-%     axis([0 l -15e4 1e4])
-    hold on
-    subplot(2,2,3), plot(x, n);
-    hold on
-%     axis([0 l 0 5e20])
-    subplot(2,2,4), plot(xm, JnDiff,'r');
-    hold on
-    subplot(2,2,4), plot(xm, JnDrift,'b');
-%     axis([0 l -5e5 5e5])
-
+        
+        subplot(2,2,1), plot(x, V);
+        xlabel('x')
+        ylabel('V')
+        title('V')
+        %     axis([0 l -0.05 0.01])
+        hold on
+        subplot(2,2,2), plot(xm, Em);
+        xlabel('x')
+        ylabel('E')
+        title('E')
+        
+        %     axis([0 l -15e4 1e4])
+        hold on
+        subplot(2,2,3), plot(x, n);
+        xlabel('x')
+        ylabel('n')
+        title('n')
+        
+        hold on
+        %     axis([0 l 0 5e20])
+        subplot(2,2,4), plot(xm, JnDiff,'r');
+        xlabel('x')
+        ylabel('Jn')
+        title('JnDiff/Diff')
+        
+        hold on
+        subplot(2,2,4), plot(xm, JnDrift,'b');
+        xlabel('x')
+        ylabel('Jn')
+        title('JnDrift/Diff')
+        
         n0 = n';
     end
-
+    
     fprintf('lbc: %g iter: %i\n',lbc,i);
-
+    
     subplot(2,2,1), plot(x, V);
-%     axis([0 l -0.05 0.01])
+    xlabel('x')
+    ylabel('V')
+    title('V')
+    %     axis([0 l -0.05 0.01])
     hold on
     subplot(2,2,2), plot(xm, Em);
-%     axis([0 l -15e4 1e4])
+    xlabel('x')
+    ylabel('E')
+    title('E')
+    
+    %     axis([0 l -15e4 1e4])
     hold on
     subplot(2,2,3), plot(x, n);
+    xlabel('x')
+    ylabel('n')
+    title('n')
+    
     hold on
-%     axis([0 l 0 5e20])
+    %     axis([0 l 0 5e20])
     subplot(2,2,4), plot(xm, JnDiff,'r');
+    xlabel('x')
+    ylabel('Jn')
+    title('JnDiff/Diff')
+    
     hold on
     subplot(2,2,4), plot(xm, JnDrift,'b');
-%     axis([0 l -5e5 5e5])
-%     Jerr = (JnDrift+JnDiff)/max(abs([JnDrift, JnDiff])*100);
-%     subplot(2,2,4), plot(xm,Jerr);
-
+    xlabel('x')
+    ylabel('Jn')
+    title('JnDrift/Diff')
+    %     axis([0 l -5e5 5e5])
+    %     Jerr = (JnDrift+JnDiff)/max(abs([JnDrift, JnDiff])*100);
+    %     subplot(2,2,4), plot(xm,Jerr);
+    
     pause(0.0001)
-
+    
 end

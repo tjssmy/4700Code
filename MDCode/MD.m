@@ -38,10 +38,12 @@ PlotFile = 'image.gif';
 PlotSize = [100, 100, 1049, 895];
 ScaleV = 0;
 ScaleF = 0;
+PlotPosOnly = 0;
 
 % Simulation initiallization
+InitThree
 % InitBlock
-InitCirc
+% InitCirc
 % InitBlock0
 % InitBlock0FD
 % InitVStream
@@ -98,7 +100,11 @@ T(c) = KETot(c) / nAtoms / C.kb;
 T0(c) = KE0 / C.kb;
 T1(c) = KE1 / C.kb;
 
-PlotVars(c, Limits);
+if PlotPosOnly
+    PlotOnlyP(c,Limits);
+else
+    PlotVars(c, Limits);
+end
 
 xp = x - dt * Vx;
 xpp = x - 2 * dt * Vx;
@@ -179,7 +185,12 @@ while t < TStop
     if t > Plt0
         fprintf('time: %g (%5.2g %%)\n', t, t / TStop * 100);
 
-        PlotVars(c, Limits);
+        if PlotPosOnly
+            PlotOnlyP(c,Limits);
+        else
+            PlotVars(c, Limits);
+        end
+        
 
         Plt0 = Plt0 + PlDelt;
         pause(0.00001)

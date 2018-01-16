@@ -12,7 +12,7 @@ xm = x(1:nx-1) + 0.5*dx;
 ni = x < l/2;
 pi = x >= l/2;
 
-Nd = 2e16 * 1e6; % Const. 1/cm3 (100 cm/m)^3
+Nd = 4e16 * 1e6; % Const. 1/cm3 (100 cm/m)^3
 Na = 1e16 * 1e6;
 NetDoping(ni) = Nd;
 NetDoping(pi) = -Na;

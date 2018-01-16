@@ -26,6 +26,7 @@ Limits = [-Size +Size -Size +Size]; % square is good
 PlDelt = 5 * dt;
 
 PlotFile = 'BlockSt.gif';
+PlotPosOnly = 1;
 doPlotImage = 0;
 PlotSize = [100, 100, 1049, 1049];
 

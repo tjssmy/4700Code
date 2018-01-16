@@ -1,3 +1,4 @@
+
 function [ output_args ] = PlotVars(c, Limits)
 global Vx Vy L W x y Fx Fy C
 global Phi nAtoms time Mass0 Mass1 Pty0in Pty1in
@@ -90,16 +91,16 @@ xlabel('time')
 ylabel('Temperature')
 title('Temperature: Each type and all')
 
-if doPlotImage
-    if PlotCount == 1
-        f = getframe(PlotFig);
-        [im, map] = rgb2ind(f.cdata, 256, 'nodither');
-        im(1, 1, 1, 2) = 0;
-
-    else
-        f = getframe(PlotFig);
-        im(:, :, 1, PlotCount) = rgb2ind(f.cdata, map, 'nodither');
-    end
-end
+% if doPlotImage
+%     if PlotCount == 1
+%         f = getframe(PlotFig);
+%         [im, map] = rgb2ind(f.cdata, 256, 'nodither');
+%         im(1, 1, 1, 2) = 0;
+% 
+%     else
+%         f = getframe(PlotFig);
+%         im(:, :, 1, PlotCount) = rgb2ind(f.cdata, map, 'nodither');
+%     end
+% end
 
 end
