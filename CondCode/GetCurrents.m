@@ -56,7 +56,7 @@ for i = 1:nx
         if i == 1
             G(n, :) = 0;
             G(n, n) = 1;
-            B(n) = 1;
+            B(n) = -1;
         elseif i == nx
             G(n, :) = 0;
             G(n, n) = 1;
@@ -159,7 +159,7 @@ if plot
     axis([0 nx 0 ny]);
     subplot(2, 2, 4), quiver(eFlowx', eFlowy');
     axis([0 nx 0 ny]);
-
+hold on
     if fc == 1
         f = getframe(fig);
         [im, map] = rgb2ind(f.cdata, 256, 'nodither');
