@@ -60,6 +60,8 @@ else %if SimType == 'e'
 
 end
 
+global im map;
+
 if doPlot
     imwrite(im, map, 'imagefile.gif', 'DelayTime', 0.2, 'LoopCount', inf);
     figure
