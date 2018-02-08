@@ -21,31 +21,32 @@ C.c = 299792458;                    % speed of light
 %   P = inv(H)*Pp
 
 
-nx = 1001;
+nx = 501;
 len = 10e-9;
 x =linspace(0, len, nx);
 dx = x(2) - x(1);
 
-% pot = @Pot_const;
-% paras = [0*C.q_0];
+pot = @Pot_const;
+paras = [0*C.q_0];
 
 % pot = @Pot_well;
 % paras = [len/64,len/2,0*C.q_0,1*C.q_0];
 
-pot = @Pot_Dwell;
-paras = [len / 16, len / 64, len / 2, 0 * C.q_0, 10 * C.q_0];
+% pot = @Pot_Dwell;
+% paras = [len / 16, len / 64, len / 2, 0 * C.q_0, 10 * C.q_0];
 
-% pot = @Pot_para;
-% paras = [10/(len^2)*C.q_0,len/2];
+pot = @Pot_para;
+paras = [10/(len^2)*C.q_0,len/2];
 
 
 
 
 dx2 = dx^2;
 B = (C.hb^2) / (2 * C.m_0);
+G = sparse(nx,nx);
 
-Cap = CAPFct(x, [len * 0.15, 1]);
-% Cap(1:nx) = 0;
+% Cap = CAPFct(x, [len * 0.15, 1]);
+Cap(1:nx) = 0;
 
 for i = 1:nx
 %     Poten(i) = pot(x(i),paras);
@@ -75,7 +76,7 @@ end
 %
 % figure
 
-Gi = inv(G);
+% Gi = inv(G);
 
 subplot(3, 1, 1), plot(x, real(Poten / C.q_0), 'k');
 hold
@@ -88,8 +89,8 @@ Tmax0 = 1e-13;
 
 K0 = C.m_0 * (len / Tmax0) / C.hb * 20; % P = hb*k k = mv/hb;
 % K0 = 0;
-P0(1, 1:nx) = (exp(-(x - len / 4).^2 / ((len / 50)^2))) .* exp(-1i * K0 * x);
-Pp = P0;
+P0(1, 1:nx) = (exp(-(x - len / 4).^2 / ((len / 50)^2))) .* exp(1i * K0 * x);
+Pp = P0.';
 maxP0 = max(abs(P0));
 subplot(3, 1, 2), plot(x, real(Pp), 'r');
 hold on
@@ -110,14 +111,14 @@ subplot(3, 1, 3), plot(Norm, 'b');
 axis([0 nSteps 0 Norm(1)*1.1])
 dt = Tmax / nSteps;
 
-H = eye(nx) - 1i * dt / C.hb * G;
-Hp = eye(nx) + 1i * dt / C.hb * G;
+H = speye(nx) - 1i * dt / C.hb * G;
+Hp = speye(nx) + 1i * dt / C.hb * G;
 
 [l,u] = lu(Hp);
 
 for j = 1:nSteps
     %      P = u\(l\(Pp'));
-    P = u\(l\(H*Pp'));
+    P = u\(l\(H*Pp));
 
     subplot(3, 1, 2), plot(x, real(P), 'r');
     hold on
@@ -135,7 +136,7 @@ for j = 1:nSteps
 
     %     pause(0.004)
 
-    Pp = P';
+    Pp = P;
 end
 
 imwrite(im, map, 'imagefile.gif', 'DelayTime', 0, 'LoopCount', inf);
