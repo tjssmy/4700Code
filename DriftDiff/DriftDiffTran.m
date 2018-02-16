@@ -38,11 +38,15 @@ PlotFile = 'image.gif';
 PlotCount = 0;
 doPlotImage = 0; % set to 1 to draw the image
 
-Simulation = 'PNJctEqBias';
+% Simulation = 'GaussianTwoCarRC';
+% Simulation = 'tjsPara';
 % Simulation = 'GaussianTwoCarRCLinGrad';
+Simulation = 'LinJct'
 
 if strcmp(Simulation,'GaussianTwoCar')
     eval('SetGaussian2CarParas');
+elseif strcmp(Simulation,'tjsPara')
+    eval('tjsPara');
 elseif strcmp(Simulation,'GaussianTwoCarRC')
     eval('SetGaussian2CarParasRCOnly');
 elseif strcmp(Simulation,'GaussianTwoCarRCLinGrad')
@@ -57,6 +61,8 @@ elseif strcmp(Simulation,'PNJct')
     eval('SetPNJctParas');
 elseif strcmp(Simulation,'PNJctEq')
     eval('SetPNJctParasEqBC');
+elseif strcmp(Simulation,'LinJct')
+    eval('SetLinPNJctParasEqBCBias');
 elseif strcmp(Simulation,'PNJctEqBias')
     eval('SetPNJctParasEqBCBias');
 end
