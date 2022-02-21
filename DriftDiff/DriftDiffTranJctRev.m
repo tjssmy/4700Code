@@ -1,13 +1,15 @@
 % clear all
-clearvars
-clearvars -GLOBAL
-close all
+% clearvars
+% clearvars -GLOBAL
+% close all
 format shorte
 set(0,'DefaultFigureWindowStyle','docked')
+
 global C V Mun Mup Gv Dn Dp Bv Em DnM MunM DpM MupM np pp x xm n p
 global Rho divFp divFn niSi TwoCarriers t EpiSi n0 p0 tauSi
 global Coupled NetDoping l PlotYAxis PlotSS im map
-global PlotCount doPlotImage
+global PlotCount doPlotImage Itot V1 tv 
+global JnDiff JpDiff JnDrift JpDrift Jtot Urc
 
 C.q_0 = 1.60217653e-19;             % electron charge
 C.hb = 1.054571596e-34;             % Dirac constant
@@ -24,9 +26,10 @@ C.Vt = C.kb*Temp/C.q_0;
 EpiSi = C.eps_0*11.68;
 MunSi = 1400*1e-4; % cm2 V-1s-1 * 1/(100 cm/m)^2
 DnSi = MunSi*C.kb*Temp/C.q_0; % D = kt/q Mun
-MupSi = 450*1e-4; % cm2 V-1s-1 * 1/(100 cm/m)^2
+% MupSi = 450*1e-4; % cm2 V-1s-1 * 1/(100 cm/m)^2
+MupSi = 1400*1e-4; % cm2 V-1s-1 * 1/(100 cm/m)^2
 DpSi = MunSi*C.kb*Temp/C.q_0; % D = kt/q Mun
-tauSi = 1e-8;
+tauSi = .1e-8;
 niSi = 1e10*1e6; % 1/cm^3 * (100 cm/m)^3 intrinsic concentration
 
 JBC = 0; % No flow BC by default
@@ -38,31 +41,58 @@ PlotFile = 'image.gif';
 PlotCount = 0;
 doPlotImage = 0; % set to 1 to draw the image
 
-Simulation = 'PNJctEqBias';
-% Simulation = 'GaussianTwoCarRCLinGrad';
+Coupled = 1;
+TwoCarriers = 1;
+RC = 1;
 
-if strcmp(Simulation,'GaussianTwoCar')
-    eval('SetGaussian2CarParas');
-elseif strcmp(Simulation,'GaussianTwoCarRC')
-    eval('SetGaussian2CarParasRCOnly');
-elseif strcmp(Simulation,'GaussianTwoCarRCLinGrad')
-    eval('SetGaussian2CarParasRCOnlyLinGrad');
-elseif strcmp(Simulation,'GaussianSingle0V')
-    eval('SetGaussian1CarParas0V');
-elseif strcmp(Simulation,'GaussianSingle1V')
-    eval('SetGaussian1CarParas1V');
-elseif strcmp(Simulation,'ExpDoping')
-    eval('SetExpDopingParas');
-elseif strcmp(Simulation,'PNJct')
-    eval('SetPNJctParas');
-elseif strcmp(Simulation,'PNJctEq')
-    eval('SetPNJctParasEqBC');
-elseif strcmp(Simulation,'PNJctEqBias')
-    eval('SetPNJctParasEqBCBias');
-end
+nx = 201;
+l = 1e-6;
+
+x =linspace(0,l,nx);
+dx = x(2)-x(1);
+xm = x(1:nx-1) + 0.5*dx;
+
+ni = x < l/2;
+pi = x >= l/2;
+
+Nd = 4e16 * 1e6; % Const. 1/cm3 (100 cm/m)^3
+Na = 4e16 * 1e6;
+NetDoping(ni) = Nd;
+NetDoping(pi) = -Na;
+
+NetDoping = -(1./(1+exp(-(x-l/2)/0.05e-6))-0.5)*Nd;
+
+
+% NetDoping = linspace(Nd,-Nd,nx);
+
+% x0 = l/2;
+% nw = l/20;
+% npDisturbance = 0e16*1e6*exp(-((x-x0)/nw).^2);
+
+JBC = 1;
+
+RVbc = 0;
+
+TStop = 80000000*1e-18;
+PlDelt = 1000000*1e-18;
+
+% Phi =  C.Vt *log(Na*Nd/(niSi*niSi));
+% W  = sqrt(2*EpiSi*(Nd+Nd)*(Phi)/(C.q_0*Nd*Na));
+% Wn = W*Na/(Nd+Na);
+% Wp = (W - Wn);
+Phi = 1.8193e-01;
+
+PlotSS = 0;
+% PlotYAxis = {[0 Phi+0.1] [0e5 40e5] [-20e2 40e2]...
+%     [0e21 2.5e22] [0 1.1e22] [0 20e43]...
+%     [-5e33 5e33] [-5e33 5e33] [-0e8 3e8] ...
+%     [1e-3 1e8] [-3e6 1e6] [0 2.5e22]};
+
+
+% fprintf('Phi: %g W: %g Wn: %g Wp: %g \n',Phi,W,Wn,Wp) 
 
 doPlotImage = 0; % force off!
-
+LVbc = Phi;
 FormGv(nx,LVbc,RVbc); % Poisson equation set Gv and Bv
 [L,U] = lu(Gv);
 
@@ -91,10 +121,10 @@ else
     p0 = zeros(1,nx);
 end
 
-n0 = n0 + npDisturbance;
-if TwoCarriers == 1
-    p0 = p0 + npDisturbance;
-end
+% n0 = n0 + npDisturbance;
+% if TwoCarriers == 1
+%     p0 = p0 + npDisturbance;
+% end
 
 divFn = zeros(1,nx);
 divFp = zeros(1,nx);
@@ -129,30 +159,48 @@ np = n0;
 p = p0;
 pp = p0;
 
-PlotVals(nx,dx,'on',l,TStop,PlotYAxis);
+Itot = [];
+V1 = [];
+tv = [];
+
+PlotValsSimple(nx,dx,'on',l,TStop,PlotYAxis,1);
 
 SimulateFlow(TStop,nx,dx,dtMax,JBC,RC,U,L,PlDelt)
 
-if SecondSim == 1
+% subplot(3,3,9);
+% plot(0,-mean(Itot(:,end)),'o');hold on
+
+
+LVbc2 = 'fl';
+FormGv(nx,LVbc2,RVbc); % Poisson equation set Gv and Bv
+[L,U] = lu(Gv);
+
+TStop2 = TStop +  800000000*1e-18;
+SimulateFlow(TStop2,nx,dx,dtMax,JBC,RC,U,L,PlDelt)
+PlotValsSimple(nx,dx,'off',l,TStop,[],1);
+
+Phi = V(1);
+
+subplot(3,3,9);
+title('I at bias point')
+% plot(Phi-V(1),log(abs(mean(Itot(:,end)))),'*');hold on
+plot(Phi-V(1),mean(Itot(:,end)),'*');hold on
+
+
+for k = 1:20
+    LVbc2 = Phi+0.03*k;
+    
     FormGv(nx,LVbc2,RVbc); % Poisson equation set Gv and Bv
     [L,U] = lu(Gv);
-
+    TStop2 = TStop2 +  80000000*1e-18;
     SimulateFlow(TStop2,nx,dx,dtMax,JBC,RC,U,L,PlDelt)
+    PlotValsSimple(nx,dx,'off',l,TStop,[],1);
+    subplot(3,3,9);
+%     plot(Phi-V(1),log(abs(mean(Itot(:,end)))),'*');hold on
+    plot(Phi-V(1),mean(Itot(:,end)),'*');hold on
 end
-
-
-if doPlotImage
-    imwrite(im,map,PlotFile,'DelayTime',0.2,'LoopCount',inf);
-end
-
 
 % fig2 = figure('Position', [100, 100, 1049, 895]);
-PlotVals(nx,dx,'off',l,TStop,[]);
+PlotValsSimple(nx,dx,'off',l,TStop,[],1);
 
-if doPlotImage
-    f = getframe(fig2);
-    [im,map] = rgb2ind(f.cdata,256,'nodither');
 
-    filename = strcat('final-',PlotFile);
-    imwrite(im,map,filename);
-end

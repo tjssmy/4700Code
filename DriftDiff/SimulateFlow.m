@@ -3,10 +3,11 @@ function SimulateFlow(TStop,nx,dx,dtMax,JBC,RC,U,L,PlDelt)
 %   Detailed explanation goes here
 global C V  Bv Em np pp  n p n0 p0 Coupled
 global Rho divFp divFn niSi TwoCarriers t EpiSi tauSi
-global NetDoping l  PlotYAxis
+global NetDoping l  PlotYAxis Urc
 
 Plt0 = PlDelt;
 
+t0 = t;
 while t < TStop
 
     MaxEm = max(abs(Em));
@@ -30,9 +31,21 @@ while t < TStop
         p = pp + dt*divFp;
         Maxp = max(p);
         if RC
-            Urc = (n.*p - n0.*p0)./(n + p + 2*niSi)/tauSi;
-            n = n - dt*Urc;
-            p = p - dt*Urc;
+            Ecrit = 5e6;
+            iE = abs(Em) > Ecrit;
+           
+            tauSiv = tauSi*ones(size(n));
+%             tauSiv(iE) = 1e-6;
+            Del = zeros(size(n));
+            Del(iE) = (n(iE)+p(iE)).*exp(Em(iE)/Ecrit)*1e-5;
+            Urc = (n.*p - n0.*p0)./(n + p + 2*niSi)./tauSiv;
+            dn = zeros(size(n));
+            if t > 5.28001e-9 && t  < 5.28002e-9                
+                dn(iE) = 1e20;
+            end
+                
+            n = n - dt*Urc+Del+dn;
+            p = p - dt*Urc+Del+dn;
         end
     else
         Maxp = 0;
@@ -61,7 +74,7 @@ while t < TStop
     t = t + dt;
     if t > Plt0
         fprintf('time: %g (%5.2g %%)\n',t,t/TStop*100);
-        PlotVals(nx,dx,'off',l,TStop,PlotYAxis);
+        PlotValsSimple(nx,dx,'off',l,TStop,PlotYAxis,1);
         Plt0 = Plt0 + PlDelt;
         pause(0.0001)
     end

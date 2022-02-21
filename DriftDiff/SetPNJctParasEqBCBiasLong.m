@@ -3,16 +3,16 @@ TwoCarriers = 1;
 RC = 1;
 
 nx = 201;
-l = 1e-6;
+l = 2e-6;
 
 x =linspace(0,l,nx);
 dx = x(2)-x(1);
 xm = x(1:nx-1) + 0.5*dx;
 
-ni = x < l/2;
-pi = x >= l/2;
+ni = x < l/3;
+pi = x >= l/3;
 
-Nd = 2e16 * 1e6; % Const. 1/cm3 (100 cm/m)^3
+Nd = 4e16 * 1e6; % Const. 1/cm3 (100 cm/m)^3
 Na = 1e16 * 1e6;
 NetDoping(ni) = Nd;
 NetDoping(pi) = -Na;
@@ -46,4 +46,4 @@ SecondSim = 1;
 LVbc2 = Phi-0.3;
 TStop2 = TStop +  80000000*1e-18;
 
-fprintf('Phi: %g W: %g Wn: %g Wp: %g \n',Phi,W,Wn,Wp) %
+fprintf('Phi: %g W: %g Wn: %g Wp: %g \n',Phi,W,Wn,Wp) 
