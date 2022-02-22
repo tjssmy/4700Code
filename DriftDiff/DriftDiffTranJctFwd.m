@@ -156,7 +156,7 @@ Itot = [];
 V1 = [];
 tv = [];
 
-PlotValsSimple(nx,dx,'on',l,TStop,PlotYAxis);
+PlotValsSimple(nx,dx,'on',l,TStop,PlotYAxis,1);
 
 SimulateFlow(TStop,nx,dx,dtMax,JBC,RC,U,L,PlDelt)
 
@@ -184,11 +184,12 @@ for k = 1:10
     [L,U] = lu(Gv);
     TStop2 = TStop2 +  80000000*1e-18;
     SimulateFlow(TStop2,nx,dx,dtMax,JBC,RC,U,L,PlDelt)
+    PlotValsSimple(nx,dx,'off',l,TStop,[],1);
     subplot(3,3,9);
     plot(Phi-V(1),-mean(Itot(:,end)),'*');hold on
 end
 
 % fig2 = figure('Position', [100, 100, 1049, 895]);
-PlotValsSimple(nx,dx,'off',l,TStop,[]);
+PlotValsSimple(nx,dx,'off',l,TStop,[],1);
 
 
