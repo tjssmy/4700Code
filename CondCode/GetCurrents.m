@@ -1,6 +1,12 @@
 function [ Curr ] = GetCurrents(ngeo, Max, nx, ny, Acond, Bcond, plot, SimType)
 global im fig fc map
 
+ix = 1:nx;
+iy = 1:ny;
+[xx,yy] = meshgrid(ix,iy);
+ft      = 0*xx;
+cMap = zeros(nx,ny) + Acond;
+
 if SimType == 'c'
     pgeo = rand(ngeo, 2);
     pgeo(:, 1) = pgeo(:, 1) * nx;
@@ -8,20 +14,12 @@ if SimType == 'c'
     rgeo = rand(ngeo,1)*Max;
     rcircs2 = rgeo.^2;
 
-    cMap = zeros(nx,ny);
 
-    for i = 1:nx
-        for j = 1:ny
-            cMap(i,j) = Acond;
-            for p = 1:ngeo
-                dx = (pgeo(p, 1) - i);
-                dy = (pgeo(p, 2) - j);
-                if dx * dx + dy * dy < rcircs2(p)
-                    cMap(i, j) = Bcond;
-                end
-            end
-        end
+    for p = 1:ngeo
+        ft = ((pgeo(p,1) - xx).^2 + (pgeo(p,2) - yy).^2) <= rcircs2(p);
+        cMap(ft) = Bcond;
     end
+
 else %if SimType == 'e'
     pgeo = rand(ngeo, 3);
     pgeo(:, 1) = pgeo(:, 1) * nx;
@@ -29,20 +27,21 @@ else %if SimType == 'e'
     pgeo(:, 3) = pgeo(:, 2) * 180;
     rgeo = ones(ngeo, 1) * Max;
 
-    cMap = zeros(nx, ny);
+    %pgeo(p,1) = xloc
+    %pgeo(p,2) = yloc
+    %rgeo(p,2) = xrad
+    %rgeo(p,2) = yrad
+    %pgeo(p,3) = rotation (degrees)
+    % cMap = zeros(nx, ny);
 
-    for i = 1:nx
-        for j = 1:ny
-            cMap(i, j) = Acond;
-            for p = 1:ngeo
-                point = [i, j];
-                el = [pgeo(p, 1), pgeo(p, 2),rgeo(p), rgeo(p) / 4, pgeo(p, 3)];
-                if isPointInEllipse(point, el)
-                    cMap(i, j)= Bcond;
-                end
-            end
-        end
+    for p = 1:ngeo
+        ft = (...
+             (((xx-pgeo(p,1))*cosd(pgeo(p,3)) + (yy-pgeo(p,2))*sind(pgeo(p,3)))/(rgeo(p,1)*1)).^2 ...
+           + (((xx-pgeo(p,1))*sind(pgeo(p,3)) - (yy-pgeo(p,2))*cosd(pgeo(p,3)))/(rgeo(p,1)/4)).^2 ...
+             ) <= 1;
+        cMap(ft) = Bcond;
     end
+
 end
 
 
@@ -151,14 +150,14 @@ if plot
 
     subplot(2, 2, 1), H = surf(cMap');
     set(H, 'linestyle', 'none');
-    view(0, 90)
+    view(0, 90); title('Current')
     subplot(2, 2, 2), H = surf(Vmap');
     set(H, 'linestyle', 'none');
-    view(0, 90)
+    view(0, 90); title('Voltage')
     subplot(2, 2, 3), quiver(Ex', Ey');
-    axis([0 nx 0 ny]);
+    axis([0 nx 0 ny]); title('E Field')
     subplot(2, 2, 4), quiver(eFlowx', eFlowy');
-    axis([0 nx 0 ny]);
+    axis([0 nx 0 ny]); title('E field * Current')
 
     if fc == 1
         f = getframe(fig);
