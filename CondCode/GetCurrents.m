@@ -144,11 +144,29 @@ Ey = -Ey;
 eFlowx = cMap .* Ex;
 eFlowy = cMap .* Ey;
 
+Ry=zeros(nx,ny);
+for i= 0:(ny/2-1)
+    Ry(:,1+i)=(ny/2-i);
+    Ry(:,ny-i)=ny/2-i;
+end
+
+eFlowR=zeros(nx,ny);
+for i= 1:nx
+    for j= 0:(ny/2-1)
+        eFlowR(i,j+1)=sum(eFlowx(i,(j+1):(ny-j)));
+        eFlowR(i,ny-j)=sum(eFlowx(i,(j+1):(ny-j)));
+    end
+end
+
+u_o=1.2566370614*10^(-6);
+
+Bmap=u_o.*eFlowR./Ry;
+
 if plot
     if fc == 1
         fig = figure();
     end
-
+  
     subplot(2, 2, 1), H = surf(cMap');
     set(H, 'linestyle', 'none');
     view(0, 90)
@@ -159,7 +177,14 @@ if plot
     axis([0 nx 0 ny]);
     subplot(2, 2, 4), quiver(eFlowx', eFlowy');
     axis([0 nx 0 ny]);
-
+    
+    figure(31)
+    mesh(Bmap);
+    title('Magnetic Feild');
+    xlabel('Y');
+    ylabel('X');
+    zlabel('|B|');
+    
     if fc == 1
         f = getframe(fig);
         [im, map] = rgb2ind(f.cdata, 256, 'nodither');
@@ -173,5 +198,7 @@ end
 C0 = sum(eFlowx(1, :));
 Cnx = sum(eFlowx(nx, :));
 Curr = (C0 + Cnx) * 0.5;
+
+
 
 end
